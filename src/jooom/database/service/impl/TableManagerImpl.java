@@ -2,6 +2,7 @@ package jooom.database.service.impl;
 
 import jooom.database.dto.TableDto;
 import jooom.database.exception.TableAlreadyExistsException;
+import jooom.database.exception.WrongTableDataException;
 import jooom.database.service.TableManager;
 
 import java.io.File;
@@ -15,12 +16,24 @@ public class TableManagerImpl implements TableManager {
      * TableDto 정보대로 테이블을 생성합니다.
      * */
     public void createTable(TableDto tableDto) throws IOException {
+        if (!validateTable(tableDto)){
+            throw new WrongTableDataException();
+        }
         /* 테이블을 만들 디렉토리를 미리 확인*/
         if (!new File(DICTIONARY_PATH).exists()) {
             new File(DICTIONARY_PATH).mkdirs();
         }
         makeDictionaryFile(tableDto);
     }
+
+    private boolean validateTable(TableDto tableDto) {
+        if (tableDto.getSizes().length != tableDto.getColumns().length ||
+        tableDto.getPrimaryKeyIndex() >= tableDto.getColumns().length){
+            return false;
+        }
+        return true;
+    }
+
     private void makeDictionaryFile(TableDto tableDto) throws IOException {
         File targetFile = new File(DICTIONARY_PATH, tableDto.getTableName() +".txt");
         if (!targetFile.createNewFile()){// 해당 테이블이 이미 존재하면 예외처리
