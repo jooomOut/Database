@@ -4,8 +4,7 @@ import jooom.database.DatabaseInterface;
 import jooom.database.dto.TableDto;
 import jooom.database.exception.TableAlreadyExistsException;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
 
 public class TableTest {
     private DatabaseInterface databaseInterface;
@@ -27,7 +26,9 @@ public class TableTest {
         try {
             databaseInterface.createTable(dto);
         } catch(TableAlreadyExistsException e){
-            System.out.println("테이블 생성 실패 - " + e.getMessage());
+            System.out.println("테이블이 이미 존재합니다. - " + e.getMessage());
+        } catch(IOException e){
+            e.printStackTrace();
         }
 
         return true;
