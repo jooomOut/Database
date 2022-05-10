@@ -14,23 +14,41 @@ public class TableTest {
     }
 
     public void testAllMethods(){
-        createTableTest(null);
+        createTableTest();
     }
-    public boolean createTableTest(TableDto tableDto){
-        // TODO: 테이블 생성 테스트하기
-        String tableName = "tableTestName";
+    public void createTableTest(){
+        createNormalTable();
+        createDuplicateTable();
+
+    }
+
+    private void createDuplicateTable() {
+        String tableName = "createTableTest";
         String[] columns = new String[]{"A", "B", "C", "D"};
-        int[] size = new int[]{3,0,3};
+        int[] size = new int[]{3,0,3,4};
         int primaryKeyIndex = 1;
         TableDto dto = new TableDto(tableName, columns, size, primaryKeyIndex, null);
         try {
             databaseInterface.createTable(dto);
         } catch(TableAlreadyExistsException e){
-            System.out.println("테이블이 이미 존재합니다. - " + e.getMessage());
+            System.out.println("createDuplicateTable - 테스트 통과");
         } catch(IOException e){
-            e.printStackTrace();
+            System.out.println("createDuplicateTable - 테스트 실패");
         }
+    }
 
-        return true;
+    private void createNormalTable() {
+        String tableName = "createTableTest";
+        String[] columns = new String[]{"FFF", "AWE", "C", "D"};
+        int[] size = new int[]{3,0,3,4};
+        int primaryKeyIndex = 2;
+        TableDto dto = new TableDto(tableName, columns, size, primaryKeyIndex, null);
+        try {
+            databaseInterface.createTable(dto);
+        } catch(Exception e){
+            System.out.println("createNormalTable - 테스트 실패");
+            return;
+        }
+        System.out.println("createNormalTable - 테스트 성공");
     }
 }
