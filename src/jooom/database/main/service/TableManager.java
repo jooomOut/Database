@@ -1,12 +1,9 @@
-package jooom.database.service;
+package jooom.database.main.service;
 
-import jooom.database.dto.TableDto;
-import jooom.database.exception.TableAlreadyExistsException;
+import jooom.database.main.dto.TableDto;
+import jooom.database.main.exception.TableAlreadyExistsException;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 public interface TableManager{
     static String DICTIONARY_PATH = "data_dictionary";

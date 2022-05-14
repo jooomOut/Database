@@ -1,9 +1,10 @@
-package jooom.database.service.impl;
+package jooom.database.main.service.impl;
 
-import jooom.database.dto.TableDto;
-import jooom.database.exception.TableAlreadyExistsException;
-import jooom.database.exception.WrongTableDataException;
-import jooom.database.service.TableManager;
+import jooom.database.main.dto.TableDto;
+import jooom.database.main.exception.TableAlreadyExistsException;
+import jooom.database.main.exception.WrongTableDataException;
+import jooom.database.main.service.TableManager;
+
 
 import java.io.File;
 import java.io.FileWriter;

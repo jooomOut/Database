@@ -1,8 +1,8 @@
 package jooom.database.test;
 
-import jooom.database.DatabaseInterface;
-import jooom.database.dto.TableDto;
-import jooom.database.exception.TableAlreadyExistsException;
+import jooom.database.main.DatabaseInterface;
+import jooom.database.main.dto.TableDto;
+import jooom.database.main.exception.TableAlreadyExistsException;
 
 import java.io.IOException;
 

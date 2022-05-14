@@ -1,4 +1,4 @@
-package jooom.database.dto;
+package jooom.database.main.dto;
 
 public class TableDto {
     String tableName;

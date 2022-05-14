@@ -1,7 +1,7 @@
 package jooom.database.test;
 
-import jooom.database.DatabaseInterface;
-import jooom.database.DatabaseInterfaceImpl;
+import jooom.database.main.DatabaseInterface;
+import jooom.database.main.DatabaseInterfaceImpl;
 
 public class TestManager {
     private DatabaseInterface databaseInterface = new DatabaseInterfaceImpl();
