@@ -6,10 +6,11 @@ import jooom.database.main.exception.WrongTableDataException;
 import jooom.database.main.service.TableManager;
 
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Scanner;
 
 public class TableManagerImpl implements TableManager {
 
@@ -27,6 +28,46 @@ public class TableManagerImpl implements TableManager {
         makeDictionaryFile(tableDto);
     }
 
+    public LinkedHashMap<String, String> sortColumns(String tableName, Map<String, String> columns){
+        LinkedHashMap<String, String> ret = new LinkedHashMap<>();
+        TableDto tableData = loadTableDto(tableName).orElseThrow(WrongTableDataException::new);
+
+        return ret;
+    }
+
+    private Optional<TableDto> loadTableDto(String tableName){
+        File targetFile = readDictionaryFile(tableName);
+        if (!targetFile.exists())
+            return Optional.empty();
+        return Optional.of(toTableDto(targetFile));
+    }
+
+    private TableDto toTableDto(File targetFile) {
+        try {
+            Scanner sc = new Scanner(targetFile);
+            String tableName = sc.nextLine();
+            String[] columns = sc.nextLine().split(" ");
+            int[] sizes = new int[columns.length];
+            for (int i = 0 ; i < sizes.length ; i++){
+                sizes[i] = sc.nextInt();
+            }
+            int primaryKeyIdx = sc.nextInt();
+            String filePath = sc.nextLine();
+            TableDto ret = new TableDto(
+                    tableName,
+                    columns,
+                    sizes,
+                    primaryKeyIdx,
+                    filePath
+            );
+            return ret;
+        } catch (FileNotFoundException e) {
+            throw new WrongTableDataException();
+        }
+
+    }
+
+
     private boolean validateTable(TableDto tableDto) {
         if (tableDto.getSizes().length != tableDto.getColumns().length ||
         tableDto.getPrimaryKeyIndex() >= tableDto.getColumns().length){
@@ -36,11 +77,15 @@ public class TableManagerImpl implements TableManager {
     }
 
     private void makeDictionaryFile(TableDto tableDto) throws IOException {
-        File targetFile = new File(DICTIONARY_PATH, tableDto.getTableName() +".txt");
+        File targetFile = readDictionaryFile(tableDto.getTableName());
         if (!targetFile.createNewFile()){// 해당 테이블이 이미 존재하면 예외처리
             throw new TableAlreadyExistsException(targetFile.getPath());
         }
         writeDictionaryData(targetFile, tableDto);
+    }
+
+    private File readDictionaryFile(String tableName){
+        return  new File(DICTIONARY_PATH, tableName +".txt");
     }
     /**
      * TableDto의 내용을 파일에 쓰는 과정.
