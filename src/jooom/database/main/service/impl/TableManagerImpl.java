@@ -31,7 +31,11 @@ public class TableManagerImpl implements TableManager {
     public LinkedHashMap<String, String> sortColumns(String tableName, Map<String, String> columns){
         LinkedHashMap<String, String> ret = new LinkedHashMap<>();
         TableDto tableData = loadTableDto(tableName).orElseThrow(WrongTableDataException::new);
-
+        for (String column : tableData.getColumns()){
+            if (columns.containsKey(column)){
+                ret.put(column, columns.get(column));
+            }
+        }
         return ret;
     }
 

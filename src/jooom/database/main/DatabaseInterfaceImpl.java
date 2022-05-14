@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class DatabaseInterfaceImpl implements DatabaseInterface {
     private TableManager tableManager = new TableManagerImpl();
-    private RecordManager recordManager = new RecordManager();
+    private RecordManager recordManager = new RecordManager(tableManager);
     @Override
     public void createTable(TableDto tableDto) throws IOException{
         tableManager.createTable(tableDto);
@@ -30,11 +30,6 @@ public class DatabaseInterfaceImpl implements DatabaseInterface {
 
     @Override
     public void insert(String tableName, Map<String, String> columns) {
-        LinkedHashMap<String, String> sortedColumns = tableManager.sortColumns(tableName, columns);
-        // todo: 1. 테이블 데이터 읽어서 순서 맞추기
-        // TODO : 2. 데이터 추가하기
-        // TODO : 3. 데이터 추가하기
-        // TODO : 2. 데이터 추가하기
-
+        recordManager.insert(tableName, columns);
     }
 }
