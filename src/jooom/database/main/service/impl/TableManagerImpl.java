@@ -105,8 +105,7 @@ public class TableManagerImpl implements TableManager {
         }
         writer.println();
         writer.println(tableDto.getPrimaryKeyIndex());
-        // TODO: 테이블 레코드 위치 추가하기
-        writer.println("real record의 위치!");
+        writer.println(RECORD_PATH +"/" +tableDto.getTableName()+"/");
         // 5. BufferedWriter close
         writer.close();
     }
