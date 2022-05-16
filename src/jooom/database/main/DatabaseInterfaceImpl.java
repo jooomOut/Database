@@ -1,7 +1,6 @@
 package jooom.database.main;
 
 import jooom.database.main.dto.TableDto;
-import jooom.database.main.recordpage.SlottedPageStructure;
 import jooom.database.main.service.RecordManager;
 import jooom.database.main.service.TableManager;
 import jooom.database.main.service.impl.TableManagerImpl;
@@ -10,8 +9,19 @@ import java.io.IOException;
 import java.util.Map;
 
 public class DatabaseInterfaceImpl implements DatabaseInterface {
-    private TableManager tableManager = new TableManagerImpl();
-    private RecordManager recordManager = new RecordManager(tableManager, new SlottedPageStructure());
+    private TableManager tableManager;
+    private RecordManager recordManager;
+
+    public DatabaseInterfaceImpl(TableManager tableManager, RecordManager recordManager) {
+        this.tableManager = tableManager;
+        this.recordManager = recordManager;
+    }
+
+    public DatabaseInterfaceImpl() {
+        this.tableManager = new TableManagerImpl();
+        this.recordManager = new RecordManager();
+    }
+
     @Override
     public void createTable(TableDto tableDto) throws IOException{
         tableManager.createTable(tableDto);

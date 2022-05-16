@@ -1,4 +1,4 @@
-package jooom.database.main.recordpage;
+package jooom.database.main.record.page;
 
 import java.util.Map;
 

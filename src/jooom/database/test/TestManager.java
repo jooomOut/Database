@@ -4,10 +4,12 @@ import jooom.database.main.DatabaseInterface;
 import jooom.database.main.DatabaseInterfaceImpl;
 
 public class TestManager {
-    private DatabaseInterface databaseInterface = new DatabaseInterfaceImpl();
+    private DatabaseInterface databaseInterface;
     private TableTest tableTest;
     private RecordTest recordTest;
-    public TestManager() {
+
+    public TestManager(DatabaseInterface databaseInterface) {
+        this.databaseInterface = databaseInterface;
         this.tableTest = new TableTest(databaseInterface);
         this.recordTest = new RecordTest(databaseInterface);
     }
