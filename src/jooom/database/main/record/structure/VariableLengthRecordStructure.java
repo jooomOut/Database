@@ -2,9 +2,9 @@ package jooom.database.main.record.structure;
 
 import java.util.Map;
 
-abstract public class RecordStructure {
+public class VariableLengthRecordStructure extends RecordStructure{
 
-    public RecordStructure() {
+    public VariableLengthRecordStructure() {
 
     }
 

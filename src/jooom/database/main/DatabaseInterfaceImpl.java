@@ -17,7 +17,7 @@ public class DatabaseInterfaceImpl implements DatabaseInterface {
         this.recordManager = recordManager;
     }
 
-    public DatabaseInterfaceImpl() {
+    public DatabaseInterfaceImpl() throws IOException {
         this.tableManager = new TableManagerImpl();
         this.recordManager = new RecordManager();
     }

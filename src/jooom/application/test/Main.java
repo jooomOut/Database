@@ -8,10 +8,12 @@ import jooom.database.main.service.RecordManager;
 import jooom.database.main.service.impl.TableManagerImpl;
 import jooom.database.test.TestManager;
 
+import java.io.IOException;
+
 public class Main {
     private static DatabaseInterface databaseInterface;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         TableManagerImpl tableManager = new TableManagerImpl();
         RecordPageStructure pageStructure = new SlottedPageStructure();
         RecordManager recordManager = new RecordManager(tableManager, pageStructure);

@@ -4,6 +4,7 @@ import jooom.database.main.record.page.RecordPageStructure;
 import jooom.database.main.record.page.SlottedPageStructure;
 import jooom.database.main.service.impl.TableManagerImpl;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public class RecordManager {
     /**
      * Default 생성자
      * */
-    public RecordManager() {
+    public RecordManager() throws IOException {
         this.tableManager = new TableManagerImpl();
         this.pageStructure = new SlottedPageStructure();
     }
