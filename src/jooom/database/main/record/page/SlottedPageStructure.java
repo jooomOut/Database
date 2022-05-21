@@ -188,7 +188,7 @@ public class SlottedPageStructure extends RecordPageStructure {
             int startEndOfFreeSize = DEFAULT_ENTRY_SIZE_BYTE + DEFAULT_END_OF_FREE_SPACE_BYTE +
                     entrySize * (DEFAULT_SLOT_SIZE_BYTE + DEFAULT_SLOT_OFFSET_SIZE_BYTE);
 
-            if (endOfFreeSize - startEndOfFreeSize < length)
+            if (endOfFreeSize - startEndOfFreeSize < length + DEFAULT_SLOT_SIZE_BYTE + DEFAULT_SLOT_OFFSET_SIZE_BYTE)
                 return false;
         } catch (IOException e) {
             e.printStackTrace();
