@@ -5,6 +5,7 @@ import jooom.database.main.record.structure.VariableLengthRecordStructure;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Scanner;
@@ -41,14 +42,94 @@ public class SlottedPageStructure extends RecordPageStructure {
         }
     }
 
+    @Override
+    public void search(String primaryKey) {
+
+    }
+
+    @Override
+    public void searchColumns(String primaryKey, String column) {
+
+    }
+
     private void insertRecord(String tableName, byte[] recordBytes) throws IOException {
         int fileNum = findPage(tableName, recordBytes.length);
 
-        File slottedPage = new File(FILE_PATH, tableName + fileNum +".txt");
+        File slottedPage = getFile(tableName, fileNum);
         if (!slottedPage.exists()){
             makeDefaultPage(slottedPage);
         }
-        // TODO: 2022/05/21 데이터 집어넣기
+        addToSlottedPage(slottedPage, recordBytes);
+    }
+
+    private File getFile(String tableName, int fileNum){
+        return new File(FILE_PATH, tableName+"-"+fileNum+".dat");
+    }
+
+    private int readByteToInt(byte[] target, int offset, int size){
+        byte[] ret = new byte[size];
+
+        for (int i = 0 ; i < size; i++){
+            ret[i] = target[offset + i];
+        }
+        return ByteBuffer.allocate(size).put(ret).rewind().getInt();
+    }
+
+    private void addToSlottedPage(File slottedPage, byte[] recordBytes) {
+        try {
+            byte[] originFile = Files.readAllBytes(slottedPage.toPath());
+
+            /*1. 레코드 삽입*/
+            int startOfEndOfFreeSpace = DEFAULT_ENTRY_SIZE_BYTE;
+            int endOfFreeSize = readByteToInt(originFile, startOfEndOfFreeSpace, DEFAULT_END_OF_FREE_SPACE_BYTE);
+
+            int startOfRecord = endOfFreeSize - recordBytes.length;
+
+            for (int idx = 0 ; idx < recordBytes.length ; idx++){
+                originFile[startOfRecord + idx] = recordBytes[idx];
+            }
+
+            /*2. 엔트리 사이즈 갱신*/
+            int entrySize = readByteToInt(originFile, 0, DEFAULT_ENTRY_SIZE_BYTE) + 1;
+            byte[] entryBuffer = ByteBuffer.allocate(DEFAULT_ENTRY_SIZE_BYTE).putInt(entrySize).array();
+            for (int idx = 0; idx < DEFAULT_ENTRY_SIZE_BYTE ; idx++){
+                originFile[idx] = entryBuffer[idx];
+            }
+            // end of free size 수정 적용
+            endOfFreeSize = startOfRecord; // free space 갱신
+            byte[] freeSpaceBuffer = ByteBuffer.allocate(DEFAULT_END_OF_FREE_SPACE_BYTE).putInt(endOfFreeSize).array();
+            for (int idx = 0; idx < DEFAULT_END_OF_FREE_SPACE_BYTE ; idx++){
+                originFile[DEFAULT_ENTRY_SIZE_BYTE + idx] = freeSpaceBuffer[idx];
+            }
+
+            int slotOffset = DEFAULT_ENTRY_SIZE_BYTE + DEFAULT_END_OF_FREE_SPACE_BYTE +
+                    (entrySize-1) * (DEFAULT_SLOT_OFFSET_SIZE_BYTE + DEFAULT_SLOT_SIZE_BYTE);
+
+            byte[] slotOffsetBuffer = ByteBuffer.allocate(DEFAULT_SLOT_OFFSET_SIZE_BYTE).putInt(startOfRecord).array();
+            for (int idx = 0; idx < DEFAULT_SLOT_OFFSET_SIZE_BYTE ; idx++){
+                originFile[slotOffset + idx] = slotOffsetBuffer[idx];
+            }
+            slotOffset += DEFAULT_SLOT_OFFSET_SIZE_BYTE;
+
+            byte[] slotSizeBuffer = ByteBuffer.allocate(DEFAULT_SLOT_SIZE_BYTE).putInt(recordBytes.length).array();
+            for (int idx = 0; idx < DEFAULT_SLOT_SIZE_BYTE ; idx++){
+                originFile[slotOffset + idx] = slotSizeBuffer[idx];
+            }
+
+            FileOutputStream fileOutputStream = new FileOutputStream(slottedPage);
+            BufferedOutputStream os = new BufferedOutputStream(fileOutputStream);
+            for (int i = 0 ; i < originFile.length ; i++){
+                os.write(originFile[i]);
+            }
+            os.flush();
+            os.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
 
     }
 
@@ -60,14 +141,21 @@ public class SlottedPageStructure extends RecordPageStructure {
 
         byte[] entry = ByteBuffer.allocate(DEFAULT_ENTRY_SIZE_BYTE).putInt(0).array();
         byte[] freeSize = ByteBuffer.allocate(DEFAULT_END_OF_FREE_SPACE_BYTE).putInt(DEFAULT_SIZE_BYTE).array();
-
+        byte[] result = new byte[DEFAULT_SIZE_BYTE];
+        int idx = 0;
         for (int i = 0; i < entry.length; i++) {
-            os.write(entry[i]); // 버퍼의 모든 문자 쓰기
+            result[idx] = entry[i];
+            idx++;
+            //os.write(entry[i]); // 버퍼의 모든 문자 쓰기
         }
         for (int i = 0; i < freeSize.length; i++) {
-            os.write(freeSize[i]); // 버퍼의 모든 문자 쓰기
+            result[idx] = freeSize[i];
+            idx++;
+            //os.write(freeSize[i]); // 버퍼의 모든 문자 쓰기
         }
-
+        for(byte x : result){
+            os.write(x);
+        }
         os.flush();
         os.close();
 
@@ -108,15 +196,7 @@ public class SlottedPageStructure extends RecordPageStructure {
         return true;
     }
 
-    @Override
-    public void search(String primaryKey) {
 
-    }
-
-    @Override
-    public void searchColumns(String primaryKey, String column) {
-
-    }
 
     private void setPageParameters() throws IOException {
         File settingFile = new File(SETTING_PATH);

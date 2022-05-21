@@ -1,5 +1,6 @@
 package jooom.database.main.record.structure;
 
+import java.util.Arrays;
 import java.util.Map;
 
 public class VariableLengthRecordStructure extends RecordStructure{
@@ -8,6 +9,8 @@ public class VariableLengthRecordStructure extends RecordStructure{
     }*/
 
     public byte[] toByteFrom(String tableName, Map<String, String> columns) {
-        return new byte[]{};
+        byte[] ret = new byte[100];
+        Arrays.fill(ret, (byte) 1);
+        return ret;
     }
 }
