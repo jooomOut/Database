@@ -8,7 +8,5 @@ abstract public class RecordStructure {
 
     }
 
-    public byte[] toByteFrom(String tableName, Map<String, String> columns) {
-        return new byte[]{};
-    }
+    abstract public byte[] toByteFrom(String tableName, Map<String, String> columns);
 }

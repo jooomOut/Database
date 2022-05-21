@@ -4,9 +4,8 @@ import java.util.Map;
 
 public class VariableLengthRecordStructure extends RecordStructure{
 
-    public VariableLengthRecordStructure() {
-
-    }
+    /*public VariableLengthRecordStructure() {
+    }*/
 
     public byte[] toByteFrom(String tableName, Map<String, String> columns) {
         return new byte[]{};

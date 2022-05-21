@@ -15,7 +15,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         TableManagerImpl tableManager = new TableManagerImpl();
-        RecordPageStructure pageStructure = new SlottedPageStructure();
+        RecordPageStructure pageStructure = SlottedPageStructure.of();
         RecordManager recordManager = new RecordManager(tableManager, pageStructure);
         databaseInterface = new DatabaseInterfaceImpl(
             new TableManagerImpl(),
