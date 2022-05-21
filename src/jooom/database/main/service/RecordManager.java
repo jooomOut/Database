@@ -33,7 +33,7 @@ public class RecordManager {
         LinkedHashMap<String, String> sortedColumns = tableManager.sortColumns(tableName, columns);
         File dir = new File(FILE_PATH);
         if(!dir.exists()) dir.mkdirs();
-        pageStructure.insert(tableName, columns);
+        pageStructure.insert(tableName, sortedColumns);
 
     }
 }

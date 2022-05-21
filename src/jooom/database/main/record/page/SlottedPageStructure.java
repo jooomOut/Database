@@ -27,7 +27,7 @@ public class SlottedPageStructure extends RecordPageStructure {
 
     /* 기본 설정된 레코드 구조 */
     public static SlottedPageStructure of() throws IOException {
-        RecordStructure recordStructure = new VariableLengthRecordStructure();
+        RecordStructure recordStructure = VariableLengthRecordStructure.of();
         return new SlottedPageStructure(recordStructure);
     }
 

@@ -7,10 +7,7 @@ import jooom.database.main.service.TableManager;
 
 
 import java.io.*;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 
 public class TableManagerImpl implements TableManager {
 
@@ -35,6 +32,15 @@ public class TableManagerImpl implements TableManager {
             if (columns.containsKey(column)){
                 ret.put(column, columns.get(column));
             }
+        }
+        return ret;
+    }
+
+    public Map<String, Integer> getColumnsSize(String tableName){
+        Map<String, Integer> ret = new HashMap<>();
+        TableDto tableData = loadTableDto(tableName).orElseThrow(WrongTableDataException::new);
+        for (int i = 0 ; i < tableData.getColumns().length ; i++){
+            ret.put(tableData.getColumns()[i], tableData.getSizes()[i]);
         }
         return ret;
     }
