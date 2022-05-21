@@ -25,6 +25,7 @@ public class TableManagerImpl implements TableManager {
         makeDictionaryFile(tableDto);
     }
 
+    @Override
     public LinkedHashMap<String, String> sortColumns(String tableName, Map<String, String> columns){
         LinkedHashMap<String, String> ret = new LinkedHashMap<>();
         TableDto tableData = loadTableDto(tableName).orElseThrow(WrongTableDataException::new);
@@ -36,8 +37,9 @@ public class TableManagerImpl implements TableManager {
         return ret;
     }
 
+    @Override
     public Map<String, Integer> getColumnsSize(String tableName){
-        Map<String, Integer> ret = new HashMap<>();
+        LinkedHashMap<String, Integer> ret = new LinkedHashMap<>();
         TableDto tableData = loadTableDto(tableName).orElseThrow(WrongTableDataException::new);
         for (int i = 0 ; i < tableData.getColumns().length ; i++){
             ret.put(tableData.getColumns()[i], tableData.getSizes()[i]);
