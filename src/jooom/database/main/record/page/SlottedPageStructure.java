@@ -7,6 +7,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -43,8 +44,49 @@ public class SlottedPageStructure extends RecordPageStructure {
     }
 
     @Override
-    public void search(String primaryKey) {
+    public Map<String, String> search(String tableName, String primaryKey) {
+        Map<String, String> ret = new HashMap<>();
+        int idx = 0;
+        while (true) {
+            File slottedPage = getFile(tableName , idx);
+            if (!slottedPage.exists()) break;
+            ret = searchFromSlottedPage(slottedPage, tableName, primaryKey);
+            if (!ret.isEmpty()) break;
+            idx++;
+        }
+        return ret;
+    }
 
+    private Map<String, String> searchFromSlottedPage(File slottedPage, String tableName, String primaryKey) {
+        Map<String, String> ret = new HashMap<>();
+        FileOutputStream fileOutputStream = null;
+        BufferedOutputStream os = null;
+        try {
+            fileOutputStream = new FileOutputStream(slottedPage);
+            os = new BufferedOutputStream(fileOutputStream);
+
+            byte[] originFile = Files.readAllBytes(slottedPage.toPath());
+
+            int entrySize = readByteToInt(originFile, 0, DEFAULT_ENTRY_SIZE_BYTE);
+            int offset =  DEFAULT_ENTRY_SIZE_BYTE + DEFAULT_END_OF_FREE_SPACE_BYTE;
+            for (int i = 0 ; i < entrySize ; i++){
+                int recordOffset = readByteToInt(originFile, offset, DEFAULT_SLOT_OFFSET_SIZE_BYTE);
+                int recordSize = readByteToInt(originFile, offset + DEFAULT_SLOT_OFFSET_SIZE_BYTE, DEFAULT_SLOT_SIZE_BYTE);
+                // TODO: 2022/05/22 위 값으로 레코드 바이트 가져와서 넘기기
+                byte[] record = new byte[recordSize - recordOffset];
+                for (int j = 0 ; j < recordSize ; j++){
+                    record[j] = originFile[recordOffset + j];
+                }
+                ret = recordStructure.searchByKey(record, tableName, primaryKey);
+                if (!ret.isEmpty()) break;
+            }
+
+            fileOutputStream.close();
+            os.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return ret;
     }
 
     @Override

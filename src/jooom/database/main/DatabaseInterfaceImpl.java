@@ -28,12 +28,12 @@ public class DatabaseInterfaceImpl implements DatabaseInterface {
     }
 
     @Override
-    public Map<String, String> search(String key) {
-        return null;
+    public Map<String, String> search(String tableName, String key) {
+        return recordManager.search(tableName, key);
     }
 
     @Override
-    public String[] search(String columnName, String key) {
+    public String[] search(String tableName, String columnName, String key) {
         return new String[0];
     }
 
