@@ -163,7 +163,7 @@ public class SlottedPageStructure extends RecordPageStructure {
 
     private int findPage(String tableName, int length) {
         for (int idx = 0 ; true ; idx++){
-            File slottedPage = new File(FILE_PATH, tableName + idx +".txt");
+            File slottedPage = getFile(tableName, idx);
             if (checkEmptySpace(slottedPage, length)){
                 return idx;
             }
@@ -233,6 +233,7 @@ public class SlottedPageStructure extends RecordPageStructure {
         writer.println(DEFAULT_SLOT_SIZE_BYTE);
         // 5. BufferedWriter close
         writer.close();
+        fw.close();
     }
 }
 
