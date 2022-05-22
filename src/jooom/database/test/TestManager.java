@@ -1,17 +1,22 @@
 package jooom.database.test;
 
-import jooom.database.DatabaseInterface;
-import jooom.database.DatabaseInterfaceImpl;
+import jooom.database.main.DatabaseInterface;
+import jooom.database.main.DatabaseInterfaceImpl;
 
 public class TestManager {
-    private DatabaseInterface databaseInterface = new DatabaseInterfaceImpl();
+    private DatabaseInterface databaseInterface;
     private TableTest tableTest;
-    public TestManager() {
-        this.tableTest = new TableTest(databaseInterface);
+    private RecordTest recordTest;
 
+    public TestManager(DatabaseInterface databaseInterface) {
+        this.databaseInterface = databaseInterface;
+        this.tableTest = new TableTest(databaseInterface);
+        this.recordTest = new RecordTest(databaseInterface);
     }
 
     public void run(){
+
         tableTest.testAllMethods();
+        recordTest.testAllMethods();
     }
 }
