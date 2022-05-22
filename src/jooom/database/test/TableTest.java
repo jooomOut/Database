@@ -25,7 +25,7 @@ public class TableTest {
     private void createDuplicateTable() {
         String tableName = "createTableTest";
         String[] columns = new String[]{"A", "B", "C", "D"};
-        int[] size = new int[]{3,0,3,4};
+        int[] size = new int[]{9,0,9,12};
         int primaryKeyIndex = 1;
         TableDto dto = new TableDto(tableName, columns, size, primaryKeyIndex, null);
         try {
@@ -40,7 +40,7 @@ public class TableTest {
     private void createNormalTable() {
         String tableName = "createTableTest";
         String[] columns = new String[]{"FFF", "AWE", "C", "D"};
-        int[] size = new int[]{3,0,3,4};
+        int[] size = new int[]{10,0,10,14};
         int primaryKeyIndex = 2;
         TableDto dto = new TableDto(tableName, columns, size, primaryKeyIndex, null);
         try {

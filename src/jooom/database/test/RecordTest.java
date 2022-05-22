@@ -19,14 +19,15 @@ public class RecordTest {
     }
 
     private void insertRecordTest(){
-        insertNormalRecord();
+        //for (int i = 0 ; i<400 ; i++)
+            insertNormalRecord();
         //insertDuplicateRecord();
     }
 
     private void insertNormalRecord() {
         String tableName = "createTableTest";
         Map<String, String> columns = new HashMap<>();
-        columns.put("FFF", "FFFfff data");
+        columns.put("FFF", "FFFf data");
         columns.put("AWE", "awe data");
         columns.put("C", "cc data");
         columns.put("D", "dd data");
