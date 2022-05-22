@@ -21,7 +21,7 @@ public class RecordTest {
     private void insertRecordTest(){
         //for (int i = 0 ; i<400 ; i++)
             insertNormalRecord();
-        //insertDuplicateRecord();
+        //insertDuplicateRecord();성
     }
 
     private void insertNormalRecord() {

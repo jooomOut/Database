@@ -63,7 +63,11 @@ public class SlottedPageStructure extends RecordPageStructure {
     }
 
     private File getFile(String tableName, int fileNum){
-        return new File(FILE_PATH, tableName+"-"+fileNum+".dat");
+        File dir = new File(FILE_PATH + "/" + tableName);
+        if (!dir.exists()){
+            dir.mkdir();
+        }
+        return new File(FILE_PATH, tableName+"/"+ tableName + "-"+fileNum+".dat");
     }
 
     private int readByteToInt(byte[] target, int offset, int size){
