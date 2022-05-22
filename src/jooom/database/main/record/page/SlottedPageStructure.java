@@ -59,12 +59,7 @@ public class SlottedPageStructure extends RecordPageStructure {
 
     private Map<String, String> searchFromSlottedPage(File slottedPage, String tableName, String primaryKey) {
         Map<String, String> ret = new HashMap<>();
-        FileOutputStream fileOutputStream = null;
-        BufferedOutputStream os = null;
         try {
-            fileOutputStream = new FileOutputStream(slottedPage);
-            os = new BufferedOutputStream(fileOutputStream);
-
             byte[] originFile = Files.readAllBytes(slottedPage.toPath());
 
             int entrySize = readByteToInt(originFile, 0, DEFAULT_ENTRY_SIZE_BYTE);
@@ -72,17 +67,17 @@ public class SlottedPageStructure extends RecordPageStructure {
             for (int i = 0 ; i < entrySize ; i++){
                 int recordOffset = readByteToInt(originFile, offset, DEFAULT_SLOT_OFFSET_SIZE_BYTE);
                 int recordSize = readByteToInt(originFile, offset + DEFAULT_SLOT_OFFSET_SIZE_BYTE, DEFAULT_SLOT_SIZE_BYTE);
-                // TODO: 2022/05/22 위 값으로 레코드 바이트 가져와서 넘기기
-                byte[] record = new byte[recordSize - recordOffset];
+
+                byte[] record = new byte[recordSize];
                 for (int j = 0 ; j < recordSize ; j++){
                     record[j] = originFile[recordOffset + j];
                 }
                 ret = recordStructure.searchByKey(record, tableName, primaryKey);
                 if (!ret.isEmpty()) break;
+
+                offset += DEFAULT_SLOT_OFFSET_SIZE_BYTE + DEFAULT_SLOT_SIZE_BYTE;
             }
 
-            fileOutputStream.close();
-            os.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -169,6 +164,8 @@ public class SlottedPageStructure extends RecordPageStructure {
             }
             os.flush();
             os.close();
+            fileOutputStream.flush();
+            fileOutputStream.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
