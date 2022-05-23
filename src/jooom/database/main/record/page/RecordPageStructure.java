@@ -11,7 +11,7 @@ public abstract class RecordPageStructure {
     }
 
     protected RecordStructure recordStructure;
-    public abstract void insert(String tableName, Map<String, String> columns);
+    public abstract void insert(String tableName, Map<String, String> columns, String primaryKey);
     public abstract Map<String, String> search(String tableName, String primaryKey);
     public abstract void searchColumns(String primaryKey, String column);
 }

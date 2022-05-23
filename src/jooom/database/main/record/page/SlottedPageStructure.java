@@ -1,5 +1,6 @@
 package jooom.database.main.record.page;
 
+import jooom.database.main.exception.DuplicateKeyException;
 import jooom.database.main.record.structure.RecordStructure;
 import jooom.database.main.record.structure.VariableLengthRecordStructure;
 
@@ -33,7 +34,10 @@ public class SlottedPageStructure extends RecordPageStructure {
     }
 
     @Override
-    public void insert(String tableName, Map<String, String> columns) {
+    public void insert(String tableName, Map<String, String> columns, String primaryKey) {
+        if (!search(tableName, primaryKey).isEmpty()){
+            throw new DuplicateKeyException(primaryKey);
+        }
         byte[] recordBytes =  recordStructure.toByteFrom(tableName, columns);
         try {
             insertRecord(tableName, recordBytes);
