@@ -1,5 +1,6 @@
 package jooom.database.main.service;
 
+import jooom.database.main.dto.TableDto;
 import jooom.database.main.record.page.RecordPageStructure;
 import jooom.database.main.record.page.SlottedPageStructure;
 import jooom.database.main.service.impl.TableManagerImpl;
@@ -31,14 +32,21 @@ public class RecordManager {
 
     public void insert(String tableName, Map<String, String> columns) {
         LinkedHashMap<String, String> sortedColumns = tableManager.sortColumns(tableName, columns);
+        String primaryKey = getPrimaryColumnName(tableName);
         File dir = new File(FILE_PATH);
         if(!dir.exists()) dir.mkdirs();
-        pageStructure.insert(tableName, sortedColumns);
+        pageStructure.insert(tableName, sortedColumns, primaryKey);
 
     }
 
     public Map<String, String> search(String tableName, String key) {
         Map <String, String> result = pageStructure.search(tableName, key);
         return result;
+    }
+
+    private String getPrimaryColumnName(String tableName){
+        TableDto tableDto = tableManager.getTableData(tableName);
+        int primaryIndex = tableDto.getPrimaryKeyIndex();
+        return tableDto.getColumns()[primaryIndex];
     }
 }
