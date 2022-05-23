@@ -15,4 +15,5 @@ public interface TableManager {
     public void createTable(TableDto tableDto) throws IOException, TableAlreadyExistsException;
     public LinkedHashMap<String, String> sortColumns(String tableName, Map<String, String> columns);
     public Map<String, Integer> getColumnsSize(String tableName);
+    public TableDto getTableData(String tableName);
 }

@@ -8,6 +8,6 @@ import java.util.Map;
 public interface DatabaseInterface {
     void createTable(TableDto tableDto) throws IOException;
     void insert(String tableName, Map<String, String> columns);
-    Map<String, String> search(String key);
-    String[] search(String columnName, String key);
+    Map<String, String> search(String tableName, String key);
+    String[] search(String tableName, String columnName, String key);
 }

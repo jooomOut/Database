@@ -11,4 +11,5 @@ abstract public class RecordStructure {
     }
 
     abstract public byte[] toByteFrom(String tableName, Map<String, String> columns);
+    abstract public Map<String, String> searchByKey(byte[] record, String tableName, String primaryKey);
 }

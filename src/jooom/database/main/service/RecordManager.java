@@ -36,4 +36,9 @@ public class RecordManager {
         pageStructure.insert(tableName, sortedColumns);
 
     }
+
+    public Map<String, String> search(String tableName, String key) {
+        Map <String, String> result = pageStructure.search(tableName, key);
+        return result;
+    }
 }

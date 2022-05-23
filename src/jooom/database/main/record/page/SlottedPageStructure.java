@@ -7,6 +7,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -43,8 +44,44 @@ public class SlottedPageStructure extends RecordPageStructure {
     }
 
     @Override
-    public void search(String primaryKey) {
+    public Map<String, String> search(String tableName, String primaryKey) {
+        Map<String, String> ret = new HashMap<>();
+        int idx = 0;
+        while (true) {
+            File slottedPage = getFile(tableName , idx);
+            if (!slottedPage.exists()) break;
+            ret = searchFromSlottedPage(slottedPage, tableName, primaryKey);
+            if (!ret.isEmpty()) break;
+            idx++;
+        }
+        return ret;
+    }
 
+    private Map<String, String> searchFromSlottedPage(File slottedPage, String tableName, String primaryKey) {
+        Map<String, String> ret = new HashMap<>();
+        try {
+            byte[] originFile = Files.readAllBytes(slottedPage.toPath());
+
+            int entrySize = readByteToInt(originFile, 0, DEFAULT_ENTRY_SIZE_BYTE);
+            int offset =  DEFAULT_ENTRY_SIZE_BYTE + DEFAULT_END_OF_FREE_SPACE_BYTE;
+            for (int i = 0 ; i < entrySize ; i++){
+                int recordOffset = readByteToInt(originFile, offset, DEFAULT_SLOT_OFFSET_SIZE_BYTE);
+                int recordSize = readByteToInt(originFile, offset + DEFAULT_SLOT_OFFSET_SIZE_BYTE, DEFAULT_SLOT_SIZE_BYTE);
+
+                byte[] record = new byte[recordSize];
+                for (int j = 0 ; j < recordSize ; j++){
+                    record[j] = originFile[recordOffset + j];
+                }
+                ret = recordStructure.searchByKey(record, tableName, primaryKey);
+                if (!ret.isEmpty()) break;
+
+                offset += DEFAULT_SLOT_OFFSET_SIZE_BYTE + DEFAULT_SLOT_SIZE_BYTE;
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return ret;
     }
 
     @Override
@@ -63,7 +100,11 @@ public class SlottedPageStructure extends RecordPageStructure {
     }
 
     private File getFile(String tableName, int fileNum){
-        return new File(FILE_PATH, tableName+"-"+fileNum+".dat");
+        File dir = new File(FILE_PATH + "/" + tableName);
+        if (!dir.exists()){
+            dir.mkdir();
+        }
+        return new File(FILE_PATH, tableName+"/"+ tableName + "-"+fileNum+".dat");
     }
 
     private int readByteToInt(byte[] target, int offset, int size){
@@ -123,6 +164,8 @@ public class SlottedPageStructure extends RecordPageStructure {
             }
             os.flush();
             os.close();
+            fileOutputStream.flush();
+            fileOutputStream.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

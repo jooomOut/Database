@@ -1,5 +1,6 @@
 package jooom.database.main.record.structure;
 
+import jooom.database.main.dto.TableDto;
 import jooom.database.main.exception.TooLargeColumnException;
 import jooom.database.main.service.TableManager;
 import jooom.database.main.service.impl.TableManagerImpl;
@@ -36,6 +37,51 @@ public class VariableLengthRecordStructure extends RecordStructure{
         setRecord(ret, columns, columnSize);
 
         return ret;
+    }
+
+    @Override
+    public Map<String, String> searchByKey(byte[] record, String tableName, String primaryKey) {
+        TableDto tableData = tableManager.getTableData(tableName);
+        String primaryColumn = tableData.getColumns()[tableData.getPrimaryKeyIndex()];
+        Map<String,String> ret = byteToMap(record, tableData);
+        if (ret.containsKey(primaryColumn) && ret.get(primaryColumn).equals(primaryKey)){
+            return ret;
+        }
+        return new HashMap<>();
+    }
+
+    private Map<String, String> byteToMap(byte[] record, TableDto tableData) {
+        Map<String, String> ret = new HashMap<>();
+        short nullBitmap = getNullBitmap(record); int columnNum = tableData.getColumns().length;
+        int offset = NULL_BITMAP_SIZE;
+        for (int columnIndex = 0 ; columnIndex < columnNum ; columnIndex++){
+            if ((nullBitmap & (1 << columnIndex)) > 0){ // null이다.
+                continue;
+            }
+            // null이 아니다. 데이터를 읽으면 됨
+            int columnSize = tableData.getSizes()[columnIndex];
+            String columnName = tableData.getColumns()[columnIndex];
+            if (columnSize > 0){ // 고정 길이
+                byte[] columnData = readByte(record, offset, columnSize);
+                ret.put(columnName, new String(columnData).replaceAll("\0", ""));
+                offset += columnSize;
+            } else { // 가변 길이
+                byte[] variableOffsetByte = readByte(record, offset, VARIABLE_OFFSET);
+                int variableOffset = ByteBuffer.allocate(VARIABLE_OFFSET).put(variableOffsetByte).rewind().getInt();
+                byte[] variableSizeByte = readByte(record, offset + VARIABLE_OFFSET, VARIABLE_SIZE);
+                int variableSize = ByteBuffer.allocate(VARIABLE_SIZE).put(variableSizeByte).rewind().getInt();
+
+                byte[] variableData = readByte(record, variableOffset, variableSize);
+                ret.put(columnName, new String(variableData).replaceAll("\0", ""));
+                offset += VARIABLE_OFFSET + VARIABLE_SIZE;
+            }
+        }
+        return ret;
+    }
+
+    private short getNullBitmap(byte[] record) {
+        byte[] nullBitMap = readByte(record, 0, NULL_BITMAP_SIZE);
+        return ByteBuffer.allocate(NULL_BITMAP_SIZE).put(nullBitMap).rewind().getShort();
     }
 
     private void setRecord(byte[] ret, Map<String, String> columns, Map<String, Integer> columnSize) {
@@ -114,6 +160,13 @@ public class VariableLengthRecordStructure extends RecordStructure{
         for (String key : columns.keySet()){
             int size = columnSize.get(key);
             ret += size > 0 ? size : columns.get(key).length();
+        }
+        return ret;
+    }
+    private byte[] readByte(byte[] origin, int offset, int size){
+        byte[] ret = new byte[size];
+        for (int idx = 0 ; idx< size; idx++){
+            ret[idx] = origin[offset+idx];
         }
         return ret;
     }

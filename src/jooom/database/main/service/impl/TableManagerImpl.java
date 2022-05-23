@@ -47,6 +47,11 @@ public class TableManagerImpl implements TableManager {
         return ret;
     }
 
+    @Override
+    public TableDto getTableData(String tableName) {
+        return loadTableDto(tableName).orElseThrow(WrongTableDataException::new);
+    }
+
     private Optional<TableDto> loadTableDto(String tableName){
         File targetFile = readDictionaryFile(tableName);
         if (!targetFile.exists())
