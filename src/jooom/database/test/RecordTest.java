@@ -22,12 +22,18 @@ public class RecordTest {
     private void insertRecordTest(){
         String tableName = "createTableTest";
         //for (int i = 0 ; i<400 ; i++)
-        insertNormalRecord(tableName);
-        insertNormalRecordWithNull(tableName);
+        insertTest(tableName);
         //insertDuplicateRecord();
         searchTest(tableName);
 
     }
+
+    private void insertTest(String tableName) {
+        insertNormalRecord(tableName);
+        insertNormalRecordWithNull(tableName);
+        insertDuplicateRecord(tableName);
+    }
+
 
     private void searchTest(String tableName) {
         Map<String,String> result = null;
@@ -38,17 +44,17 @@ public class RecordTest {
 
     private void searchRecordByNotNull(String tableName, String searchKey) {
         Map<String,String> result = databaseInterface.search(tableName, searchKey);
-        if (!result.isEmpty()) { System.out.println("searchRecordByEmptyResult - 성공");
+        if (!result.isEmpty()) { System.out.println("searchRecordByEmptyResult - 테스트 성공");
         } else {
-            System.out.println("searchRecordByEmptyResult - 실패");
+            System.out.println("searchRecordByEmptyResult - 테스트 실패");
         }
     }
 
     private void searchRecordWithNull(String tableName, String searchKey) {
         Map<String,String> result = databaseInterface.search(tableName, searchKey);
-        if (result.isEmpty()) { System.out.println("searchRecordWithNull - 실패");
+        if (result.isEmpty()) { System.out.println("searchRecordWithNull - 테스트 실패");
         } else {
-            System.out.println("searchRecordWithNull - 성공");
+            System.out.println("searchRecordWithNull - 테스트 성공");
         }
     }
 
@@ -82,5 +88,20 @@ public class RecordTest {
             return;
         }
         System.out.println("insertNormalRecordWithNull - 테스트 성공");
+    }
+
+    private void insertDuplicateRecord(String tableName) {
+        Map<String, String> columns = new HashMap<>();
+        columns.put("FFF", "FFFf data");
+        columns.put("C", "cnull");
+        columns.put("D", "dd data");
+
+        try {
+            databaseInterface.insert(tableName, columns);
+        } catch(DuplicateKeyException e) {
+            System.out.println("insertDuplicateRecord - 테스트 성공");
+            return;
+        }
+        System.out.println("insertDuplicateRecord - 테스트 성공");
     }
 }
