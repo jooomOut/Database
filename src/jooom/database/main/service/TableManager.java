@@ -2,6 +2,7 @@ package jooom.database.main.service;
 
 import jooom.database.main.dto.TableDto;
 import jooom.database.main.exception.TableAlreadyExistsException;
+import jooom.database.main.exception.WrongTableDataException;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -13,6 +14,7 @@ public interface TableManager {
     static String RECORD_PATH =  FILE_PATH + "/" + "record";
 
     public void createTable(TableDto tableDto) throws IOException, TableAlreadyExistsException;
+    public void dropTable(String tableName) throws WrongTableDataException;
     public LinkedHashMap<String, String> sortColumns(String tableName, Map<String, String> columns);
     public Map<String, Integer> getColumnsSize(String tableName);
     public TableDto getTableData(String tableName);

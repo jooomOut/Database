@@ -9,12 +9,19 @@ import java.io.IOException;
 public class TableTest {
     private DatabaseInterface databaseInterface;
 
+    private static final String tableName = "student";
+    private static final String[] columns = new String[]{"dept_name", "name", "id", "tot_cred"};
+    private static final int[] size = new int[]{0,0,11,3};
+    private static final int primaryKeyIndex = 2;
     public TableTest(DatabaseInterface databaseInterface) {
         this.databaseInterface = databaseInterface;
     }
 
     public void testAllMethods(){
         createTableTest();
+    }
+    public void clearTestTable() {
+        databaseInterface.dropTable(tableName);
     }
     public void createTableTest(){
         createNormalTable();
@@ -23,10 +30,6 @@ public class TableTest {
     }
 
     private void createDuplicateTable() {
-        String tableName = "createTableTest";
-        String[] columns = new String[]{"A", "B", "C", "D"};
-        int[] size = new int[]{9,0,9,12};
-        int primaryKeyIndex = 1;
         TableDto dto = new TableDto(tableName, columns, size, primaryKeyIndex, null);
         try {
             databaseInterface.createTable(dto);
@@ -38,10 +41,6 @@ public class TableTest {
     }
 
     private void createNormalTable() {
-        String tableName = "createTableTest";
-        String[] columns = new String[]{"FFF", "AWE", "C", "D"};
-        int[] size = new int[]{10,0,10,14};
-        int primaryKeyIndex = 2;
         TableDto dto = new TableDto(tableName, columns, size, primaryKeyIndex, null);
         try {
             databaseInterface.createTable(dto);

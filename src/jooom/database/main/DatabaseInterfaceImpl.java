@@ -26,7 +26,10 @@ public class DatabaseInterfaceImpl implements DatabaseInterface {
     public void createTable(TableDto tableDto) throws IOException{
         tableManager.createTable(tableDto);
     }
-
+    @Override
+    public void dropTable(String tableName) {
+        tableManager.dropTable(tableName);
+    }
     @Override
     public Map<String, String> search(String tableName, String key) {
         return recordManager.search(tableName, key);
@@ -36,6 +39,7 @@ public class DatabaseInterfaceImpl implements DatabaseInterface {
     public String[] search(String tableName, String columnName, String key) {
         return new String[0];
     }
+
 
     @Override
     public void insert(String tableName, Map<String, String> columns) {

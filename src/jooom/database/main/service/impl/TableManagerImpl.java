@@ -26,6 +26,13 @@ public class TableManagerImpl implements TableManager {
     }
 
     @Override
+    public void dropTable(String tableName) throws WrongTableDataException {
+        File tableFile = readDictionaryFile(tableName);
+        if (!tableFile.exists()) throw new WrongTableDataException();
+        tableFile.delete();
+    }
+
+    @Override
     public LinkedHashMap<String, String> sortColumns(String tableName, Map<String, String> columns){
         LinkedHashMap<String, String> ret = new LinkedHashMap<>();
         TableDto tableData = loadTableDto(tableName).orElseThrow(WrongTableDataException::new);
@@ -59,30 +66,6 @@ public class TableManagerImpl implements TableManager {
         return Optional.of(toTableDto(targetFile));
     }
 
-    private TableDto toTableDto(File targetFile) {
-        try {
-            Scanner sc = new Scanner(targetFile);
-            String tableName = sc.nextLine();
-            String[] columns = sc.nextLine().split(" ");
-            int[] sizes = new int[columns.length];
-            for (int i = 0 ; i < sizes.length ; i++){
-                sizes[i] = sc.nextInt();
-            }
-            int primaryKeyIdx = sc.nextInt();
-            String filePath = sc.nextLine();
-            TableDto ret = new TableDto(
-                    tableName,
-                    columns,
-                    sizes,
-                    primaryKeyIdx,
-                    filePath
-            );
-            return ret;
-        } catch (FileNotFoundException e) {
-            throw new WrongTableDataException();
-        }
-
-    }
 
 
     private boolean validateTable(TableDto tableDto) {
@@ -126,5 +109,31 @@ public class TableManagerImpl implements TableManager {
         // 5. BufferedWriter close
         writer.close();
     }
+
+    private TableDto toTableDto(File targetFile) {
+        try {
+            Scanner sc = new Scanner(targetFile);
+            String tableName = sc.nextLine();
+            String[] columns = sc.nextLine().split(" ");
+            int[] sizes = new int[columns.length];
+            for (int i = 0 ; i < sizes.length ; i++){
+                sizes[i] = sc.nextInt();
+            }
+            int primaryKeyIdx = sc.nextInt();
+            String filePath = sc.nextLine();
+            TableDto ret = new TableDto(
+                    tableName,
+                    columns,
+                    sizes,
+                    primaryKeyIdx,
+                    filePath
+            );
+            return ret;
+        } catch (FileNotFoundException e) {
+            throw new WrongTableDataException();
+        }
+
+    }
+
 
 }
