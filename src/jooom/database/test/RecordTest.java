@@ -1,8 +1,9 @@
 package jooom.database.test;
 
 import jooom.database.main.DatabaseInterface;
-import jooom.database.main.exception.DuplicateKeyException;
-import jooom.database.main.exception.WrongTableDataException;
+import jooom.database.main.exception.record.DuplicateKeyException;
+import jooom.database.main.exception.table.WrongTableDataException;
+import jooom.database.main.util.LogUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,10 +35,10 @@ public class RecordTest {
 
 
     private void searchTest(String tableName) {
-        Map<String,String> result = null;
+        // 단일 검색
         searchRecordByNotNull(tableName, "20173156");
         searchRecordWithNull(tableName, "20175382");
-        //searchRecordByNotNullBitmap(tableName, "");
+        // 컬럼 겅색
         searchRecords(tableName);
     }
 
@@ -51,10 +52,10 @@ public class RecordTest {
         try {
             databaseInterface.insert(tableName, columns);
         } catch(WrongTableDataException | DuplicateKeyException e) {
-            System.out.println("insertNormalRecord - 테스트 실패");
+            LogUtil.printTestTitle("insertNormalRecord", "테스트 실패");
             return;
         }
-        System.out.println("insertNormalRecord - 테스트 성공");
+        LogUtil.printTestTitle("insertNormalRecord", "테스트 성공");
     }
 
     private void insertNormalRecordWithNull(String tableName) {
@@ -66,10 +67,10 @@ public class RecordTest {
         try {
             databaseInterface.insert(tableName, columns);
         } catch(WrongTableDataException | DuplicateKeyException e) {
-            System.out.println("insertNormalRecordWithNull - 테스트 실패");
+            LogUtil.printTestTitle("insertNormalRecordWithNull", "테스트 실패");
             return;
         }
-        System.out.println("insertNormalRecordWithNull - 테스트 성공");
+        LogUtil.printTestTitle("insertNormalRecordWithNull", "테스트 성공");
     }
 
     private void insertDuplicateRecord(String tableName) {
@@ -82,25 +83,25 @@ public class RecordTest {
         try {
             databaseInterface.insert(tableName, columns);
         } catch(DuplicateKeyException e) {
-            System.out.println("insertDuplicateRecord - 테스트 성공");
+            LogUtil.printTestTitle("insertDuplicateRecord", "테스트 성공");
             return;
         }
-        System.out.println("insertDuplicateRecord - 테스트 성공");
+        LogUtil.printTestTitle("insertDuplicateRecord", "테스트 실패");
     }
 
     private void searchRecordByNotNull(String tableName, String searchKey) {
         Map<String,String> result = databaseInterface.search(tableName, searchKey);
-        if (!result.isEmpty()) { System.out.println("searchRecordByEmptyResult - 테스트 성공");
+        if (!result.isEmpty()) { LogUtil.printTestTitle("searchRecordByEmptyResult", "테스트 성공");
         } else {
-            System.out.println("searchRecordByEmptyResult - 테스트 실패");
+            LogUtil.printTestTitle("searchRecordByEmptyResult", "테스트 실패");
         }
     }
 
     private void searchRecordWithNull(String tableName, String searchKey) {
         Map<String,String> result = databaseInterface.search(tableName, searchKey);
-        if (result.isEmpty()) { System.out.println("searchRecordWithNull - 테스트 실패");
+        if (result.isEmpty()) {LogUtil.printTestTitle("searchRecordWithNull", "테스트 실패");
         } else {
-            System.out.println("searchRecordWithNull - 테스트 성공");
+            LogUtil.printTestTitle("searchRecordWithNull", "테스트 실패");
         }
     }
 

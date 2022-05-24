@@ -2,7 +2,8 @@ package jooom.database.test;
 
 import jooom.database.main.DatabaseInterface;
 import jooom.database.main.dto.TableDto;
-import jooom.database.main.exception.TableAlreadyExistsException;
+import jooom.database.main.exception.table.TableAlreadyExistsException;
+import jooom.database.main.util.LogUtil;
 
 import java.io.IOException;
 
@@ -34,9 +35,9 @@ public class TableTest {
         try {
             databaseInterface.createTable(dto);
         } catch(TableAlreadyExistsException e){
-            System.out.println("createDuplicateTable - 테스트 성공");
+            LogUtil.printTestTitle("createDuplicateTable", "테스트 성공");
         } catch(IOException e){
-            System.out.println("createDuplicateTable - 테스트 실패");
+            LogUtil.printTestTitle("createDuplicateTable", "테스트 실패");
         }
     }
 
@@ -45,9 +46,9 @@ public class TableTest {
         try {
             databaseInterface.createTable(dto);
         } catch(Exception e){
-            System.out.println("createNormalTable - 테스트 실패");
+            LogUtil.printTestTitle("createNormalTable", "테스트 실패");
             return;
         }
-        System.out.println("createNormalTable - 테스트 성공");
+        LogUtil.printTestTitle("createNormalTable", "테스트 성공");
     }
 }
