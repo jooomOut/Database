@@ -1,4 +1,4 @@
-package jooom.database.main.exception;
+package jooom.database.main.exception.record;
 
 public class TooLargeColumnException extends RuntimeException {
     private static final String MSG = "데이터가 너무 큽니다.";
