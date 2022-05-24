@@ -6,11 +6,12 @@ import jooom.database.main.exception.table.WrongTableDataException;
 import jooom.database.main.util.LogUtil;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RecordTest {
     private DatabaseInterface databaseInterface;
-
+    private int recordNum = 0;
     public RecordTest(DatabaseInterface databaseInterface) {
         this.databaseInterface = databaseInterface;
     }
@@ -42,7 +43,7 @@ public class RecordTest {
         searchRecords(tableName);
     }
 
-        private void insertNormalRecord(String tableName) {
+    private void insertNormalRecord(String tableName) {
         Map<String, String> columns = new HashMap<>();
         columns.put("id", "20173156");
         columns.put("tot_cred", "132");
@@ -56,6 +57,7 @@ public class RecordTest {
             return;
         }
         LogUtil.printTestTitle("insertNormalRecord", "테스트 성공");
+        recordNum++;
     }
 
     private void insertNormalRecordWithNull(String tableName) {
@@ -71,6 +73,7 @@ public class RecordTest {
             return;
         }
         LogUtil.printTestTitle("insertNormalRecordWithNull", "테스트 성공");
+        recordNum++;
     }
 
     private void insertDuplicateRecord(String tableName) {
@@ -101,13 +104,20 @@ public class RecordTest {
         Map<String,String> result = databaseInterface.search(tableName, searchKey);
         if (result.isEmpty()) {LogUtil.printTestTitle("searchRecordWithNull", "테스트 실패");
         } else {
-            LogUtil.printTestTitle("searchRecordWithNull", "테스트 실패");
+            LogUtil.printTestTitle("searchRecordWithNull", "테스트 성공");
         }
     }
 
 
     private void searchRecords(String tableName) {
+        String[] columns = new String[]{"id", "tot_cred"};
+        List<Map<String,String>> ret = databaseInterface.searchColumns(tableName, columns);
 
+        if(recordNum == ret.size()){
+            LogUtil.printTestTitle("searchRecords", "테스트 성공");
+        } else {
+            LogUtil.printTestTitle("searchRecords", "테스트 실패");
+        }
     }
 
 }

@@ -6,6 +6,9 @@ import jooom.database.main.service.TableManager;
 import jooom.database.main.service.impl.TableManagerImpl;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DatabaseInterfaceImpl implements DatabaseInterface {
@@ -37,8 +40,8 @@ public class DatabaseInterfaceImpl implements DatabaseInterface {
     }
 
     @Override
-    public String[] search(String tableName, String columnName, String key) {
-        return new String[0];
+    public List<Map<String,String>> searchColumns(String tableName, String[] columns) {
+        return recordManager.searchColumns(tableName, columns);
     }
 
 

@@ -7,7 +7,9 @@ import jooom.database.main.service.impl.TableManagerImpl;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RecordManager {
@@ -42,6 +44,11 @@ public class RecordManager {
     public Map<String, String> search(String tableName, String key) {
         Map <String, String> result = pageStructure.search(tableName, key);
         return result;
+    }
+
+    public List<Map<String,String>> searchColumns(String tableName, String[] columns){
+        List<Map<String,String>> ret = new ArrayList<>();
+        return ret;
     }
 
     public void clearAllRecords(String tableName) {
