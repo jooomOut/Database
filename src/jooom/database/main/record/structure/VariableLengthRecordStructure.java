@@ -155,11 +155,11 @@ public class VariableLengthRecordStructure extends RecordStructure{
 
     private int calcRecordSize(Map<String, String> columns, Map<String, Integer> columnSize) {
         int ret = 0;
+        int slotSize = VARIABLE_OFFSET + VARIABLE_SIZE;
         ret += NULL_BITMAP_SIZE;
-        ret += VARIABLE_OFFSET + VARIABLE_SIZE;
         for (String key : columns.keySet()){
             int size = columnSize.get(key);
-            ret += size > 0 ? size : columns.get(key).length();
+            ret += size > 0 ? size : columns.get(key).length() + slotSize;
         }
         return ret;
     }
