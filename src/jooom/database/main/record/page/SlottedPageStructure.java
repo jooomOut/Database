@@ -1,6 +1,7 @@
 package jooom.database.main.record.page;
 
-import jooom.database.main.exception.DuplicateKeyException;
+import jooom.database.main.exception.record.DuplicateKeyException;
+import jooom.database.main.exception.record.NoPrimaryKeyException;
 import jooom.database.main.record.structure.RecordStructure;
 import jooom.database.main.record.structure.VariableLengthRecordStructure;
 
@@ -34,16 +35,23 @@ public class SlottedPageStructure extends RecordPageStructure {
     }
 
     @Override
-    public void insert(String tableName, Map<String, String> columns, String primaryKey) {
-        if (!search(tableName, primaryKey).isEmpty()){
-            throw new DuplicateKeyException(primaryKey);
-        }
+    public void insert(String tableName, Map<String, String> columns, String primaryKeyColumnName) {
+        validateRecord(tableName, columns, primaryKeyColumnName);
         byte[] recordBytes =  recordStructure.toByteFrom(tableName, columns);
         try {
             insertRecord(tableName, recordBytes);
         } catch(IOException e){
-            // TODO: 예외처리
             e.printStackTrace();
+        }
+    }
+
+    private void validateRecord(String tableName, Map<String, String> columns, String primaryKeyColumnName) {
+        if (!columns.containsKey(primaryKeyColumnName)){
+            throw new NoPrimaryKeyException(tableName);
+        }
+        String primaryKey = columns.get(primaryKeyColumnName);
+        if (!search(tableName, primaryKey).isEmpty()){
+            throw new DuplicateKeyException(primaryKey);
         }
     }
 

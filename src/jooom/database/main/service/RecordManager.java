@@ -32,10 +32,10 @@ public class RecordManager {
 
     public void insert(String tableName, Map<String, String> columns) {
         LinkedHashMap<String, String> sortedColumns = tableManager.sortColumns(tableName, columns);
-        String primaryKey = getPrimaryColumnName(tableName);
+        String primaryKeyColumn = getPrimaryColumnName(tableName);
         File dir = new File(FILE_PATH);
         if(!dir.exists()) dir.mkdirs();
-        pageStructure.insert(tableName, sortedColumns, primaryKey);
+        pageStructure.insert(tableName, sortedColumns, primaryKeyColumn);
 
     }
 

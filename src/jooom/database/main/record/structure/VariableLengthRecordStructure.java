@@ -1,7 +1,7 @@
 package jooom.database.main.record.structure;
 
 import jooom.database.main.dto.TableDto;
-import jooom.database.main.exception.TooLargeColumnException;
+import jooom.database.main.exception.record.TooLargeColumnException;
 import jooom.database.main.service.TableManager;
 import jooom.database.main.service.impl.TableManagerImpl;
 

@@ -1,8 +1,8 @@
 package jooom.database.main.service;
 
 import jooom.database.main.dto.TableDto;
-import jooom.database.main.exception.TableAlreadyExistsException;
-import jooom.database.main.exception.WrongTableDataException;
+import jooom.database.main.exception.table.TableAlreadyExistsException;
+import jooom.database.main.exception.table.WrongTableDataException;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
