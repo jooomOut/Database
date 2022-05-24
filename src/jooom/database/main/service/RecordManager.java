@@ -44,9 +44,25 @@ public class RecordManager {
         return result;
     }
 
+    public void clearAllRecords(String tableName) {
+        File dir = new File(FILE_PATH + tableName);
+        while(dir.exists()) {
+            File[] file_list = dir.listFiles();
+
+            for (int j = 0; j < file_list.length; j++) {
+                file_list[j].delete(); //파일 삭제
+            }
+            if(file_list.length == 0 && dir.isDirectory()){
+                dir.delete(); //대상폴더 삭제
+            }
+        }
+    }
+
     private String getPrimaryColumnName(String tableName){
         TableDto tableDto = tableManager.getTableData(tableName);
         int primaryIndex = tableDto.getPrimaryKeyIndex();
         return tableDto.getColumns()[primaryIndex];
     }
+
+
 }

@@ -6,7 +6,6 @@ import jooom.database.main.exception.WrongTableDataException;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class RecordTest {
     private DatabaseInterface databaseInterface;
@@ -20,10 +19,9 @@ public class RecordTest {
     }
 
     private void insertRecordTest(){
-        String tableName = "createTableTest";
+        String tableName = "student";
         //for (int i = 0 ; i<400 ; i++)
         insertTest(tableName);
-        //insertDuplicateRecord();
         searchTest(tableName);
 
     }
@@ -37,9 +35,57 @@ public class RecordTest {
 
     private void searchTest(String tableName) {
         Map<String,String> result = null;
-        searchRecordByNotNull(tableName, "cc");
-        searchRecordWithNull(tableName, "cnull");
+        searchRecordByNotNull(tableName, "20173156");
+        searchRecordWithNull(tableName, "20175382");
         //searchRecordByNotNullBitmap(tableName, "");
+        searchRecords(tableName);
+    }
+
+        private void insertNormalRecord(String tableName) {
+        Map<String, String> columns = new HashMap<>();
+        columns.put("id", "20173156");
+        columns.put("tot_cred", "132");
+        columns.put("dept_name", "industrial security");
+        columns.put("name", "kim jun ki");
+
+        try {
+            databaseInterface.insert(tableName, columns);
+        } catch(WrongTableDataException | DuplicateKeyException e) {
+            System.out.println("insertNormalRecord - 테스트 실패");
+            return;
+        }
+        System.out.println("insertNormalRecord - 테스트 성공");
+    }
+
+    private void insertNormalRecordWithNull(String tableName) {
+        Map<String, String> columns = new HashMap<>();
+        columns.put("id", "20175382");
+        columns.put("tot_cred", "132");
+        columns.put("name", "JJJ");
+
+        try {
+            databaseInterface.insert(tableName, columns);
+        } catch(WrongTableDataException | DuplicateKeyException e) {
+            System.out.println("insertNormalRecordWithNull - 테스트 실패");
+            return;
+        }
+        System.out.println("insertNormalRecordWithNull - 테스트 성공");
+    }
+
+    private void insertDuplicateRecord(String tableName) {
+        Map<String, String> columns = new HashMap<>();
+        columns.put("id", "20173156");
+        columns.put("tot_cred", "132");
+        columns.put("dept_name", "industrial security");
+        columns.put("name", "kim jun ki");
+
+        try {
+            databaseInterface.insert(tableName, columns);
+        } catch(DuplicateKeyException e) {
+            System.out.println("insertDuplicateRecord - 테스트 성공");
+            return;
+        }
+        System.out.println("insertDuplicateRecord - 테스트 성공");
     }
 
     private void searchRecordByNotNull(String tableName, String searchKey) {
@@ -58,50 +104,9 @@ public class RecordTest {
         }
     }
 
-    private void insertNormalRecord(String tableName) {
-        Map<String, String> columns = new HashMap<>();
-        columns.put("FFF", "FFFf data");
-        columns.put("AWE", "awe data");
-        columns.put("C", "cc");
-        columns.put("D", "dd data");
 
+    private void searchRecords(String tableName) {
 
-        try {
-            databaseInterface.insert(tableName, columns);
-        } catch(WrongTableDataException | DuplicateKeyException e) {
-            System.out.println("insertNormalRecord - 테스트 실패");
-            return;
-        }
-        System.out.println("insertNormalRecord - 테스트 성공");
     }
 
-    private void insertNormalRecordWithNull(String tableName) {
-        Map<String, String> columns = new HashMap<>();
-        columns.put("FFF", "FFFf data");
-        columns.put("C", "cnull");
-        columns.put("D", "dd data");
-
-        try {
-            databaseInterface.insert(tableName, columns);
-        } catch(WrongTableDataException | DuplicateKeyException e) {
-            System.out.println("insertNormalRecordWithNull - 테스트 실패");
-            return;
-        }
-        System.out.println("insertNormalRecordWithNull - 테스트 성공");
-    }
-
-    private void insertDuplicateRecord(String tableName) {
-        Map<String, String> columns = new HashMap<>();
-        columns.put("FFF", "FFFf data");
-        columns.put("C", "cnull");
-        columns.put("D", "dd data");
-
-        try {
-            databaseInterface.insert(tableName, columns);
-        } catch(DuplicateKeyException e) {
-            System.out.println("insertDuplicateRecord - 테스트 성공");
-            return;
-        }
-        System.out.println("insertDuplicateRecord - 테스트 성공");
-    }
 }

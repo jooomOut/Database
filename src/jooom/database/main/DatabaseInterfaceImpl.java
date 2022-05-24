@@ -29,6 +29,7 @@ public class DatabaseInterfaceImpl implements DatabaseInterface {
     @Override
     public void dropTable(String tableName) {
         tableManager.dropTable(tableName);
+        recordManager.clearAllRecords(tableName);
     }
     @Override
     public Map<String, String> search(String tableName, String key) {

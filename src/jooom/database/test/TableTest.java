@@ -34,7 +34,7 @@ public class TableTest {
         try {
             databaseInterface.createTable(dto);
         } catch(TableAlreadyExistsException e){
-            System.out.println("createDuplicateTable - 테스트 통과");
+            System.out.println("createDuplicateTable - 테스트 성공");
         } catch(IOException e){
             System.out.println("createDuplicateTable - 테스트 실패");
         }
