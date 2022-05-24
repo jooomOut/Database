@@ -1,20 +1,18 @@
 package jooom.database.main.record.page;
 
-import jooom.database.main.exception.DuplicateKeyException;
+import jooom.database.main.exception.record.DuplicateKeyException;
+import jooom.database.main.exception.record.NoPrimaryKeyException;
 import jooom.database.main.record.structure.RecordStructure;
 import jooom.database.main.record.structure.VariableLengthRecordStructure;
 
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class SlottedPageStructure extends RecordPageStructure {
-    private static String SETTING_PATH = "settings/common.txt";
-    private static String FILE_PATH = "files/records/";
+    private static final String SETTING_PATH = "settings/common.txt";
+    private static final String FILE_PATH = "files/records/";
 
     private static int DEFAULT_SIZE_BYTE = 4096;
     private static int DEFAULT_ENTRY_SIZE_BYTE = 4;
@@ -34,15 +32,12 @@ public class SlottedPageStructure extends RecordPageStructure {
     }
 
     @Override
-    public void insert(String tableName, Map<String, String> columns, String primaryKey) {
-        if (!search(tableName, primaryKey).isEmpty()){
-            throw new DuplicateKeyException(primaryKey);
-        }
+    public void insert(String tableName, Map<String, String> columns, String primaryKeyColumnName) {
+        validateRecord(tableName, columns, primaryKeyColumnName);
         byte[] recordBytes =  recordStructure.toByteFrom(tableName, columns);
         try {
             insertRecord(tableName, recordBytes);
         } catch(IOException e){
-            // TODO: 예외처리
             e.printStackTrace();
         }
     }
@@ -54,43 +49,82 @@ public class SlottedPageStructure extends RecordPageStructure {
         while (true) {
             File slottedPage = getFile(tableName , idx);
             if (!slottedPage.exists()) break;
-            ret = searchFromSlottedPage(slottedPage, tableName, primaryKey);
+            ret = searchFromSlottedPageByKey(slottedPage, tableName, primaryKey);
             if (!ret.isEmpty()) break;
             idx++;
         }
         return ret;
     }
 
-    private Map<String, String> searchFromSlottedPage(File slottedPage, String tableName, String primaryKey) {
+    @Override
+    public List<Map<String, String>> searchColumns(String tableName, String[] columns){
+        List<Map<String, String>> ret = new ArrayList<>();
+        int idx = 0;
+        while (true) {
+            File slottedPage = getFile(tableName , idx);
+            if (!slottedPage.exists()) break;
+            List<Map<String, String>> records = searchColumnsFromPage(slottedPage, tableName, columns);
+            if (!records.isEmpty()) ret.addAll(records);
+            idx++;
+        }
+        return ret;
+    }
+
+    private void validateRecord(String tableName, Map<String, String> columns, String primaryKeyColumnName) {
+        if (!columns.containsKey(primaryKeyColumnName)){
+            throw new NoPrimaryKeyException(tableName);
+        }
+        String primaryKey = columns.get(primaryKeyColumnName);
+        if (!search(tableName, primaryKey).isEmpty()){
+            throw new DuplicateKeyException(primaryKey);
+        }
+    }
+
+    private Map<String, String> searchFromSlottedPageByKey(File slottedPage, String tableName, String primaryKey) {
         Map<String, String> ret = new HashMap<>();
+        List<byte[]> records = extractRecordByte(slottedPage);
+        for (byte[] record : records){
+            ret = recordStructure.searchByKey(record, tableName, primaryKey);
+            if (!ret.isEmpty()) return ret;
+        }
+        return new HashMap<>();
+    }
+
+    private List<Map<String, String>> searchColumnsFromPage(File slottedPage, String tableName, String[] columns) {
+        List<Map<String, String>> ret = new ArrayList<>();
+        List<byte[]> records = extractRecordByte(slottedPage);
+        for (byte[] record : records){
+            Map<String, String> parsedMap = recordStructure.getSpecificColumns(tableName, record, columns);
+            if (!parsedMap.isEmpty()) ret.add(parsedMap);
+        }
+        return ret;
+    }
+
+    private List<byte[]> extractRecordByte(File slottedPage){
+        List<byte[]> ret = new ArrayList<>();
         try {
             byte[] originFile = Files.readAllBytes(slottedPage.toPath());
+            int entrySize = readIntFromByte(originFile, 0, DEFAULT_ENTRY_SIZE_BYTE);
 
-            int entrySize = readByteToInt(originFile, 0, DEFAULT_ENTRY_SIZE_BYTE);
-            int offset =  DEFAULT_ENTRY_SIZE_BYTE + DEFAULT_END_OF_FREE_SPACE_BYTE;
             for (int i = 0 ; i < entrySize ; i++){
-                int recordOffset = readByteToInt(originFile, offset, DEFAULT_SLOT_OFFSET_SIZE_BYTE);
-                int recordSize = readByteToInt(originFile, offset + DEFAULT_SLOT_OFFSET_SIZE_BYTE, DEFAULT_SLOT_SIZE_BYTE);
-
-                byte[] record = new byte[recordSize];
-                for (int j = 0 ; j < recordSize ; j++){
-                    record[j] = originFile[recordOffset + j];
-                }
-                ret = recordStructure.searchByKey(record, tableName, primaryKey);
-                if (!ret.isEmpty()) break;
-
-                offset += DEFAULT_SLOT_OFFSET_SIZE_BYTE + DEFAULT_SLOT_SIZE_BYTE;
+                byte[] record = findRecord(originFile, i);
+                ret.add(record);
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
         return ret;
     }
 
-    @Override
-    public void searchColumns(String primaryKey, String column) {
+    private byte[] findRecord(byte[] originFile, int entryNum) {
+        int offset =  DEFAULT_ENTRY_SIZE_BYTE + DEFAULT_END_OF_FREE_SPACE_BYTE +
+                entryNum * (DEFAULT_SLOT_OFFSET_SIZE_BYTE + DEFAULT_SLOT_SIZE_BYTE);
+        int recordOffset = readIntFromByte(originFile, offset, DEFAULT_SLOT_OFFSET_SIZE_BYTE);
+        int recordSize = readIntFromByte(originFile, offset + DEFAULT_SLOT_OFFSET_SIZE_BYTE, DEFAULT_SLOT_SIZE_BYTE);
 
+        byte[] record = new byte[recordSize];
+        System.arraycopy(originFile, recordOffset, record, 0, recordSize);
+        return record;
     }
 
     private void insertRecord(String tableName, byte[] recordBytes) throws IOException {
@@ -111,12 +145,10 @@ public class SlottedPageStructure extends RecordPageStructure {
         return new File(FILE_PATH, tableName+"/"+ tableName + "-"+fileNum+".dat");
     }
 
-    private int readByteToInt(byte[] target, int offset, int size){
+    private int readIntFromByte(byte[] target, int offset, int size){
         byte[] ret = new byte[size];
 
-        for (int i = 0 ; i < size; i++){
-            ret[i] = target[offset + i];
-        }
+        System.arraycopy(target, offset, ret, 0, size);
         return ByteBuffer.allocate(size).put(ret).rewind().getInt();
     }
 
@@ -126,7 +158,7 @@ public class SlottedPageStructure extends RecordPageStructure {
 
             /*1. 레코드 삽입*/
             int startOfEndOfFreeSpace = DEFAULT_ENTRY_SIZE_BYTE;
-            int endOfFreeSize = readByteToInt(originFile, startOfEndOfFreeSpace, DEFAULT_END_OF_FREE_SPACE_BYTE);
+            int endOfFreeSize = readIntFromByte(originFile, startOfEndOfFreeSpace, DEFAULT_END_OF_FREE_SPACE_BYTE);
 
             int startOfRecord = endOfFreeSize - recordBytes.length;
 
@@ -135,49 +167,36 @@ public class SlottedPageStructure extends RecordPageStructure {
             }
 
             /*2. 엔트리 사이즈 갱신*/
-            int entrySize = readByteToInt(originFile, 0, DEFAULT_ENTRY_SIZE_BYTE) + 1;
+            int entrySize = readIntFromByte(originFile, 0, DEFAULT_ENTRY_SIZE_BYTE) + 1;
             byte[] entryBuffer = ByteBuffer.allocate(DEFAULT_ENTRY_SIZE_BYTE).putInt(entrySize).array();
-            for (int idx = 0; idx < DEFAULT_ENTRY_SIZE_BYTE ; idx++){
-                originFile[idx] = entryBuffer[idx];
-            }
+            System.arraycopy(entryBuffer, 0, originFile, 0, DEFAULT_ENTRY_SIZE_BYTE);
             // end of free size 수정 적용
             endOfFreeSize = startOfRecord; // free space 갱신
             byte[] freeSpaceBuffer = ByteBuffer.allocate(DEFAULT_END_OF_FREE_SPACE_BYTE).putInt(endOfFreeSize).array();
-            for (int idx = 0; idx < DEFAULT_END_OF_FREE_SPACE_BYTE ; idx++){
-                originFile[DEFAULT_ENTRY_SIZE_BYTE + idx] = freeSpaceBuffer[idx];
-            }
+            System.arraycopy(freeSpaceBuffer, 0, originFile, DEFAULT_ENTRY_SIZE_BYTE, DEFAULT_END_OF_FREE_SPACE_BYTE);
 
             int slotOffset = DEFAULT_ENTRY_SIZE_BYTE + DEFAULT_END_OF_FREE_SPACE_BYTE +
                     (entrySize-1) * (DEFAULT_SLOT_OFFSET_SIZE_BYTE + DEFAULT_SLOT_SIZE_BYTE);
 
             byte[] slotOffsetBuffer = ByteBuffer.allocate(DEFAULT_SLOT_OFFSET_SIZE_BYTE).putInt(startOfRecord).array();
-            for (int idx = 0; idx < DEFAULT_SLOT_OFFSET_SIZE_BYTE ; idx++){
-                originFile[slotOffset + idx] = slotOffsetBuffer[idx];
-            }
+            System.arraycopy(slotOffsetBuffer, 0, originFile, slotOffset + 0, DEFAULT_SLOT_OFFSET_SIZE_BYTE);
             slotOffset += DEFAULT_SLOT_OFFSET_SIZE_BYTE;
 
             byte[] slotSizeBuffer = ByteBuffer.allocate(DEFAULT_SLOT_SIZE_BYTE).putInt(recordBytes.length).array();
-            for (int idx = 0; idx < DEFAULT_SLOT_SIZE_BYTE ; idx++){
-                originFile[slotOffset + idx] = slotSizeBuffer[idx];
-            }
+            System.arraycopy(slotSizeBuffer, 0, originFile, slotOffset + 0, DEFAULT_SLOT_SIZE_BYTE);
 
             FileOutputStream fileOutputStream = new FileOutputStream(slottedPage);
             BufferedOutputStream os = new BufferedOutputStream(fileOutputStream);
-            for (int i = 0 ; i < originFile.length ; i++){
-                os.write(originFile[i]);
+            for (byte b : originFile) {
+                os.write(b);
             }
             os.flush();
             os.close();
             fileOutputStream.flush();
             fileOutputStream.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-
     }
 
     private void makeDefaultPage(File slottedPage) throws IOException {
@@ -190,22 +209,13 @@ public class SlottedPageStructure extends RecordPageStructure {
         byte[] freeSize = ByteBuffer.allocate(DEFAULT_END_OF_FREE_SPACE_BYTE).putInt(DEFAULT_SIZE_BYTE).array();
         byte[] result = new byte[DEFAULT_SIZE_BYTE];
         int idx = 0;
-        for (int i = 0; i < entry.length; i++) {
-            result[idx] = entry[i];
-            idx++;
-            //os.write(entry[i]); // 버퍼의 모든 문자 쓰기
-        }
-        for (int i = 0; i < freeSize.length; i++) {
-            result[idx] = freeSize[i];
-            idx++;
-            //os.write(freeSize[i]); // 버퍼의 모든 문자 쓰기
-        }
-        for(byte x : result){
-            os.write(x);
-        }
+        for (byte b : entry) result[idx++] = b;
+        for (byte b : freeSize) result[idx++] = b;
+
+        for(byte x : result) os.write(x);
+
         os.flush();
         os.close();
-
     }
 
     private int findPage(String tableName, int length) {
@@ -223,14 +233,11 @@ public class SlottedPageStructure extends RecordPageStructure {
             FileInputStream fileInputStream = new FileInputStream(slottedPage);
             BufferedInputStream bs = new BufferedInputStream(fileInputStream);
 
-            byte[] buffer = new byte[Math.max(DEFAULT_ENTRY_SIZE_BYTE, DEFAULT_END_OF_FREE_SPACE_BYTE)];
+            byte[] buffer = new byte[DEFAULT_ENTRY_SIZE_BYTE +  DEFAULT_END_OF_FREE_SPACE_BYTE];
+            bs.read(buffer, 0, DEFAULT_ENTRY_SIZE_BYTE +  DEFAULT_END_OF_FREE_SPACE_BYTE);
 
-            bs.read(buffer, 0, DEFAULT_ENTRY_SIZE_BYTE);
-            int entrySize = ByteBuffer.allocate(DEFAULT_END_OF_FREE_SPACE_BYTE).put(buffer).rewind().getInt();
-
-            Arrays.fill(buffer, (byte)0);
-            bs.read(buffer, 0, DEFAULT_ENTRY_SIZE_BYTE);
-            int endOfFreeSize = ByteBuffer.allocate(DEFAULT_END_OF_FREE_SPACE_BYTE).put(buffer).rewind().getInt();
+            int entrySize = readIntFromByte(buffer, 0, DEFAULT_ENTRY_SIZE_BYTE);
+            int endOfFreeSize = readIntFromByte(buffer, DEFAULT_ENTRY_SIZE_BYTE, DEFAULT_END_OF_FREE_SPACE_BYTE);
 
             int startEndOfFreeSize = DEFAULT_ENTRY_SIZE_BYTE + DEFAULT_END_OF_FREE_SPACE_BYTE +
                     entrySize * (DEFAULT_SLOT_SIZE_BYTE + DEFAULT_SLOT_OFFSET_SIZE_BYTE);

@@ -1,4 +1,4 @@
-package jooom.database.main.exception;
+package jooom.database.main.exception.table;
 
 import java.nio.file.FileAlreadyExistsException;
 

@@ -1,8 +1,8 @@
 package jooom.database.main.service.impl;
 
 import jooom.database.main.dto.TableDto;
-import jooom.database.main.exception.TableAlreadyExistsException;
-import jooom.database.main.exception.WrongTableDataException;
+import jooom.database.main.exception.table.TableAlreadyExistsException;
+import jooom.database.main.exception.table.WrongTableDataException;
 import jooom.database.main.service.TableManager;
 
 
@@ -23,6 +23,13 @@ public class TableManagerImpl implements TableManager {
             new File(DICTIONARY_PATH).mkdirs();
         }
         makeDictionaryFile(tableDto);
+    }
+
+    @Override
+    public void dropTable(String tableName) throws WrongTableDataException {
+        File tableFile = readDictionaryFile(tableName);
+        if (!tableFile.exists()) throw new WrongTableDataException();
+        tableFile.delete();
     }
 
     @Override
@@ -59,30 +66,6 @@ public class TableManagerImpl implements TableManager {
         return Optional.of(toTableDto(targetFile));
     }
 
-    private TableDto toTableDto(File targetFile) {
-        try {
-            Scanner sc = new Scanner(targetFile);
-            String tableName = sc.nextLine();
-            String[] columns = sc.nextLine().split(" ");
-            int[] sizes = new int[columns.length];
-            for (int i = 0 ; i < sizes.length ; i++){
-                sizes[i] = sc.nextInt();
-            }
-            int primaryKeyIdx = sc.nextInt();
-            String filePath = sc.nextLine();
-            TableDto ret = new TableDto(
-                    tableName,
-                    columns,
-                    sizes,
-                    primaryKeyIdx,
-                    filePath
-            );
-            return ret;
-        } catch (FileNotFoundException e) {
-            throw new WrongTableDataException();
-        }
-
-    }
 
 
     private boolean validateTable(TableDto tableDto) {
@@ -126,5 +109,31 @@ public class TableManagerImpl implements TableManager {
         // 5. BufferedWriter close
         writer.close();
     }
+
+    private TableDto toTableDto(File targetFile) {
+        try {
+            Scanner sc = new Scanner(targetFile);
+            String tableName = sc.nextLine();
+            String[] columns = sc.nextLine().split(" ");
+            int[] sizes = new int[columns.length];
+            for (int i = 0 ; i < sizes.length ; i++){
+                sizes[i] = sc.nextInt();
+            }
+            int primaryKeyIdx = sc.nextInt();
+            String filePath = sc.nextLine();
+            TableDto ret = new TableDto(
+                    tableName,
+                    columns,
+                    sizes,
+                    primaryKeyIdx,
+                    filePath
+            );
+            return ret;
+        } catch (FileNotFoundException e) {
+            throw new WrongTableDataException();
+        }
+
+    }
+
 
 }

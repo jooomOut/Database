@@ -7,7 +7,9 @@ import jooom.database.main.service.impl.TableManagerImpl;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RecordManager {
@@ -32,10 +34,10 @@ public class RecordManager {
 
     public void insert(String tableName, Map<String, String> columns) {
         LinkedHashMap<String, String> sortedColumns = tableManager.sortColumns(tableName, columns);
-        String primaryKey = getPrimaryColumnName(tableName);
+        String primaryKeyColumn = getPrimaryColumnName(tableName);
         File dir = new File(FILE_PATH);
         if(!dir.exists()) dir.mkdirs();
-        pageStructure.insert(tableName, sortedColumns, primaryKey);
+        pageStructure.insert(tableName, sortedColumns, primaryKeyColumn);
 
     }
 
@@ -44,9 +46,30 @@ public class RecordManager {
         return result;
     }
 
+    public List<Map<String,String>> searchColumns(String tableName, String[] columns){
+        List<Map<String,String>> ret = pageStructure.searchColumns(tableName, columns);
+        return ret;
+    }
+
+    public void clearAllRecords(String tableName) {
+        File dir = new File(FILE_PATH + tableName);
+        while(dir.exists()) {
+            File[] file_list = dir.listFiles();
+
+            for (int j = 0; j < file_list.length; j++) {
+                file_list[j].delete(); //파일 삭제
+            }
+            if(file_list.length == 0 && dir.isDirectory()){
+                dir.delete(); //대상폴더 삭제
+            }
+        }
+    }
+
     private String getPrimaryColumnName(String tableName){
         TableDto tableDto = tableManager.getTableData(tableName);
         int primaryIndex = tableDto.getPrimaryKeyIndex();
         return tableDto.getColumns()[primaryIndex];
     }
+
+
 }
