@@ -47,7 +47,7 @@ public class RecordManager {
     }
 
     public List<Map<String,String>> searchColumns(String tableName, String[] columns){
-        List<Map<String,String>> ret = new ArrayList<>();
+        List<Map<String,String>> ret = pageStructure.searchColumns(tableName, columns);
         return ret;
     }
 

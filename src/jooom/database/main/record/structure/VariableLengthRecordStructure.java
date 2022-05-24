@@ -62,21 +62,27 @@ public class VariableLengthRecordStructure extends RecordStructure{
             int columnSize = tableData.getSizes()[columnIndex];
             String columnName = tableData.getColumns()[columnIndex];
             if (columnSize > 0){ // 고정 길이
-                byte[] columnData = readByte(record, offset, columnSize);
-                ret.put(columnName, new String(columnData).replaceAll("\0", ""));
+                ret.put(columnName, getStrFromByte(record, offset, columnSize));
                 offset += columnSize;
             } else { // 가변 길이
-                byte[] variableOffsetByte = readByte(record, offset, VARIABLE_OFFSET);
-                int variableOffset = ByteBuffer.allocate(VARIABLE_OFFSET).put(variableOffsetByte).rewind().getInt();
-                byte[] variableSizeByte = readByte(record, offset + VARIABLE_OFFSET, VARIABLE_SIZE);
-                int variableSize = ByteBuffer.allocate(VARIABLE_SIZE).put(variableSizeByte).rewind().getInt();
+                int variableOffset = getIntFromByte(record, offset, VARIABLE_OFFSET);
+                int variableSize = getIntFromByte(record, offset + VARIABLE_OFFSET, VARIABLE_SIZE);
+                ret.put(columnName, getStrFromByte(record, variableOffset, variableSize));
 
-                byte[] variableData = readByte(record, variableOffset, variableSize);
-                ret.put(columnName, new String(variableData).replaceAll("\0", ""));
                 offset += VARIABLE_OFFSET + VARIABLE_SIZE;
             }
         }
         return ret;
+    }
+
+    private int getIntFromByte(byte[] record, int offset, int size) {
+        byte[] bytes = readByte(record, offset, size);
+        return ByteBuffer.allocate(size).put(bytes).rewind().getInt();
+    }
+
+    private String getStrFromByte(byte[] record, int offset, int size) {
+        byte[] bytes = readByte(record, offset, size);
+        return new String(bytes).replaceAll("\0", "");
     }
 
     private short getNullBitmap(byte[] record) {
@@ -107,19 +113,17 @@ public class VariableLengthRecordStructure extends RecordStructure{
             int offsetPlace = placeMap.get(key);
             String data = variableMap.get(key);
 
-            // TODO: 2022/05/22 offsetplace - 4 에 offset 값 넣기
             byte[] offsetByte = ByteBuffer.allocate(VARIABLE_OFFSET).putInt(offset).array();
             for(int i = 0 ; i < VARIABLE_OFFSET ; i++){
                 ret[offsetPlace + i] = offsetByte[i];
             }
             offsetPlace += VARIABLE_OFFSET;
-            // TODO: 2022/05/22 offsetplace - 4 ~ 8  에 data length 값 넣기
+
             byte[] lengthByte = ByteBuffer.allocate(VARIABLE_OFFSET).putInt(data.length()).array();
             for(int i = 0 ; i < VARIABLE_SIZE ; i++){
                 ret[offsetPlace + i] = lengthByte[i];
             }
 
-            // TODO: 2022/05/22 offset ~ data length에 데이터 넣기
             byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
             for(int i = 0 ; i < dataBytes.length ; i++){
                 ret[offset + i] = dataBytes[i];
@@ -163,6 +167,7 @@ public class VariableLengthRecordStructure extends RecordStructure{
         }
         return ret;
     }
+
     private byte[] readByte(byte[] origin, int offset, int size){
         byte[] ret = new byte[size];
         for (int idx = 0 ; idx< size; idx++){
