@@ -49,7 +49,7 @@ public class SlottedPageStructure extends RecordPageStructure {
         while (true) {
             File slottedPage = getFile(tableName , idx);
             if (!slottedPage.exists()) break;
-            ret = searchFromSlottedPage(slottedPage, tableName, primaryKey);
+            ret = searchFromSlottedPageByKey(slottedPage, tableName, primaryKey);
             if (!ret.isEmpty()) break;
             idx++;
         }
@@ -63,8 +63,8 @@ public class SlottedPageStructure extends RecordPageStructure {
         while (true) {
             File slottedPage = getFile(tableName , idx);
             if (!slottedPage.exists()) break;
-            //ret = searchFromSlottedPage(slottedPage, tableName, columns);
-            if (!ret.isEmpty()) break;
+            List<Map<String, String>> records = searchColumnsFromPage(slottedPage, tableName, columns);
+            if (!records.isEmpty()) ret.addAll(records);
             idx++;
         }
         return ret;
@@ -80,19 +80,36 @@ public class SlottedPageStructure extends RecordPageStructure {
         }
     }
 
-    private Map<String, String> searchFromSlottedPage(File slottedPage, String tableName, String primaryKey) {
+    private Map<String, String> searchFromSlottedPageByKey(File slottedPage, String tableName, String primaryKey) {
         Map<String, String> ret = new HashMap<>();
+        List<byte[]> records = extractRecordByte(slottedPage);
+        for (byte[] record : records){
+            ret = recordStructure.searchByKey(record, tableName, primaryKey);
+            if (!ret.isEmpty()) return ret;
+        }
+        return new HashMap<>();
+    }
+
+    private List<Map<String, String>> searchColumnsFromPage(File slottedPage, String tableName, String[] columns) {
+        List<Map<String, String>> ret = new ArrayList<>();
+        List<byte[]> records = extractRecordByte(slottedPage);
+        for (byte[] record : records){
+            Map<String, String> parsedMap = recordStructure.getSpecificColumns(tableName, record, columns);
+            if (!parsedMap.isEmpty()) ret.add(parsedMap);
+        }
+        return ret;
+    }
+
+    private List<byte[]> extractRecordByte(File slottedPage){
+        List<byte[]> ret = new ArrayList<>();
         try {
             byte[] originFile = Files.readAllBytes(slottedPage.toPath());
             int entrySize = readIntFromByte(originFile, 0, DEFAULT_ENTRY_SIZE_BYTE);
 
             for (int i = 0 ; i < entrySize ; i++){
-                byte[] temp = findRecord(originFile, i);
-                // TODO: 2022/05/24 얘만 분리하면 되는데...
-                ret = recordStructure.searchByKey(temp, tableName, primaryKey);
-                if (!ret.isEmpty()) break;
+                byte[] record = findRecord(originFile, i);
+                ret.add(record);
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }

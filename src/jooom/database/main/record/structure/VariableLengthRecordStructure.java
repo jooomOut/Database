@@ -40,6 +40,24 @@ public class VariableLengthRecordStructure extends RecordStructure{
     }
 
     @Override
+    public Map<String, String> getSpecificColumns(String tableName, byte[] recordByte, String[] columns) {
+        TableDto tableDto = tableManager.getTableData(tableName);
+        Map<String, String> recordMap = byteToMap(recordByte, tableDto);
+        return selectColumns(recordMap, columns, tableName);
+    }
+
+    private Map<String, String> selectColumns(Map<String, String> recordMap, String[] columns, String tableName) {
+        Map<String, String> ret = new HashMap<>();
+        for (String column : columns){
+            if (recordMap.containsKey(column)){
+                ret.put(column, recordMap.get(column));
+            }
+        }
+        return ret;
+    }
+
+
+    @Override
     public Map<String, String> searchByKey(byte[] record, String tableName, String primaryKey) {
         TableDto tableData = tableManager.getTableData(tableName);
         String primaryColumn = tableData.getColumns()[tableData.getPrimaryKeyIndex()];
