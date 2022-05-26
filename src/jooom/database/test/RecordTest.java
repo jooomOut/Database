@@ -1,6 +1,7 @@
 package jooom.database.test;
 
 import jooom.database.main.DatabaseInterface;
+import jooom.database.main.dto.TableDto;
 import jooom.database.main.exception.record.DuplicateKeyException;
 import jooom.database.main.exception.table.WrongTableDataException;
 import jooom.database.main.util.LogUtil;
@@ -50,8 +51,14 @@ public class RecordTest {
         columns.put("dept_name", "industrial security");
         columns.put("name", "kim jun ki");
 
+        String beforeTest = "insertNormalRecord - 입력 값";
+        String afterTest = "insertNormalRecord - 출력 값";
+        TableDto tableDto = databaseInterface.getTableData(tableName);
+        LogUtil.showRecordData(beforeTest, tableName, columns, tableDto.getColumns());
         try {
             databaseInterface.insert(tableName, columns);
+            List<Map<String,String>> ret= databaseInterface.searchColumns(tableName, tableDto.getColumns());
+            LogUtil.showRecordData(afterTest, tableName, ret, tableDto.getColumns());
         } catch(WrongTableDataException | DuplicateKeyException e) {
             LogUtil.printTestTitle("insertNormalRecord", "테스트 실패");
             return;
@@ -66,8 +73,14 @@ public class RecordTest {
         columns.put("tot_cred", "132");
         columns.put("name", "JJJ");
 
+        String beforeTest = "insertNormalRecordWithNull - 입력 값";
+        String afterTest = "insertNormalRecordWithNull - 출력 값";
+        TableDto tableDto = databaseInterface.getTableData(tableName);
+        LogUtil.showRecordData(beforeTest, tableName, columns, tableDto.getColumns());
         try {
             databaseInterface.insert(tableName, columns);
+            List<Map<String,String>> ret= databaseInterface.searchColumns(tableName, tableDto.getColumns());
+            LogUtil.showRecordData(afterTest, tableName, ret, tableDto.getColumns());
         } catch(WrongTableDataException | DuplicateKeyException e) {
             LogUtil.printTestTitle("insertNormalRecordWithNull", "테스트 실패");
             return;
@@ -83,9 +96,17 @@ public class RecordTest {
         columns.put("dept_name", "industrial security");
         columns.put("name", "kim jun ki");
 
+        String beforeTest = "insertDuplicateRecord - 입력 값";
+        String afterTest = "insertDuplicateRecord - 출력 값";
+        TableDto tableDto = databaseInterface.getTableData(tableName);
+        LogUtil.showRecordData(beforeTest, tableName, columns, tableDto.getColumns());
         try {
+            List<Map<String,String>> ret= databaseInterface.searchColumns(tableName, tableDto.getColumns());
+            LogUtil.showRecordData("insertDuplicateRecord - 삽입 전", tableName, ret, tableDto.getColumns());
             databaseInterface.insert(tableName, columns);
         } catch(DuplicateKeyException e) {
+            List<Map<String,String>> ret= databaseInterface.searchColumns(tableName, tableDto.getColumns());
+            LogUtil.showRecordData(afterTest, tableName, ret, tableDto.getColumns());
             LogUtil.printTestTitle("insertDuplicateRecord", "테스트 성공");
             return;
         }
@@ -94,14 +115,22 @@ public class RecordTest {
 
     private void searchRecordByNotNull(String tableName, String searchKey) {
         Map<String,String> result = databaseInterface.search(tableName, searchKey);
-        if (!result.isEmpty()) { LogUtil.printTestTitle("searchRecordByEmptyResult", "테스트 성공");
+
+        String testName = "searchRecordByNotNull";
+        TableDto tableDto = databaseInterface.getTableData(tableName);
+        LogUtil.showRecordData(testName, tableName, result, tableDto.getColumns());
+        if (!result.isEmpty()) { LogUtil.printTestTitle("searchRecordByNotNull", "테스트 성공");
         } else {
-            LogUtil.printTestTitle("searchRecordByEmptyResult", "테스트 실패");
+            LogUtil.printTestTitle("searchRecordByNotNull", "테스트 실패");
         }
     }
 
     private void searchRecordWithNull(String tableName, String searchKey) {
         Map<String,String> result = databaseInterface.search(tableName, searchKey);
+
+        String testName = "searchRecordWithNull";
+        TableDto tableDto = databaseInterface.getTableData(tableName);
+        LogUtil.showRecordData(testName, tableName, result, tableDto.getColumns());
         if (result.isEmpty()) {LogUtil.printTestTitle("searchRecordWithNull", "테스트 실패");
         } else {
             LogUtil.printTestTitle("searchRecordWithNull", "테스트 성공");
@@ -113,6 +142,9 @@ public class RecordTest {
         String[] columns = new String[]{"id", "tot_cred"};
         List<Map<String,String>> ret = databaseInterface.searchColumns(tableName, columns);
 
+        String testName = "searchRecordWithNull";
+        TableDto tableDto = databaseInterface.getTableData(tableName);
+        LogUtil.showRecordData(testName, tableName, ret, tableDto.getColumns());
         if(recordNum == ret.size()){
             LogUtil.printTestTitle("searchRecords", "테스트 성공");
         } else {
