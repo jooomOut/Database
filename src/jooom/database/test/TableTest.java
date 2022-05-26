@@ -27,28 +27,39 @@ public class TableTest {
     public void createTableTest(){
         createNormalTable();
         createDuplicateTable();
-
     }
 
     private void createDuplicateTable() {
+        String beforeTest = "createDuplicateTable - 입력 값";
+        String afterTest = "createDuplicateTable - 결과 값";
+        String testName = "createDuplicateTable";
         TableDto dto = new TableDto(tableName, columns, size, primaryKeyIndex, null);
+        LogUtil.showTableData(beforeTest,dto);
         try {
             databaseInterface.createTable(dto);
         } catch(TableAlreadyExistsException e){
-            LogUtil.printTestTitle("createDuplicateTable", "테스트 성공");
+            TableDto ret = databaseInterface.getTableData(tableName);
+            LogUtil.showTableData(afterTest,ret);
+            LogUtil.printTestTitle(testName, "테스트 성공");
         } catch(IOException e){
-            LogUtil.printTestTitle("createDuplicateTable", "테스트 실패");
+            LogUtil.printTestTitle(testName, "테스트 실패");
         }
+
     }
 
     private void createNormalTable() {
+        String beforeTest = "createNormalTable - 입력 값";
+        String afterTest = "createNormalTable - 결과";
+        String testName=  "createNormalTable";
         TableDto dto = new TableDto(tableName, columns, size, primaryKeyIndex, null);
+        LogUtil.showTableData(beforeTest,dto);
         try {
             databaseInterface.createTable(dto);
+            TableDto ret = databaseInterface.getTableData(tableName);
+            LogUtil.showTableData(afterTest, ret);
+            LogUtil.printTestTitle(testName, "테스트 성공");
         } catch(Exception e){
-            LogUtil.printTestTitle("createNormalTable", "테스트 실패");
-            return;
+            LogUtil.printTestTitle(testName, "테스트 실패");
         }
-        LogUtil.printTestTitle("createNormalTable", "테스트 성공");
     }
 }
