@@ -14,4 +14,5 @@ public interface DatabaseInterface {
     List<Map<String,String>> searchColumns(String tableName, String[] columns);
 
     void dropTable(String tableName);
+    TableDto getTableData(String tableName);
 }

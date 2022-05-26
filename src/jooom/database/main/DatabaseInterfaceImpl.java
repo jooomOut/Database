@@ -34,6 +34,12 @@ public class DatabaseInterfaceImpl implements DatabaseInterface {
         tableManager.dropTable(tableName);
         recordManager.clearAllRecords(tableName);
     }
+
+    @Override
+    public TableDto getTableData(String tableName) {
+        return tableManager.getTableData(tableName);
+    }
+
     @Override
     public Map<String, String> search(String tableName, String key) {
         return recordManager.search(tableName, key);
