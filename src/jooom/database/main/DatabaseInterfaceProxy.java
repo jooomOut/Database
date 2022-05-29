@@ -1,6 +1,7 @@
 package jooom.database.main;
 
 import jooom.database.main.dto.TableDto;
+import jooom.database.main.util.LogUtil;
 
 import java.io.IOException;
 import java.util.List;
@@ -15,7 +16,9 @@ public class DatabaseInterfaceProxy implements DatabaseInterface {
 
     @Override
     public void createTable(TableDto tableDto) throws IOException {
+        LogUtil.showTableData("CREATE_TABLE - "+tableDto.getTableName(),tableDto);
         target.createTable(tableDto);
+        getTableData(tableDto.getTableName());
     }
 
     @Override
@@ -42,6 +45,8 @@ public class DatabaseInterfaceProxy implements DatabaseInterface {
 
     @Override
     public TableDto getTableData(String tableName) {
-        return target.getTableData(tableName);
+        TableDto ret = target.getTableData(tableName);
+        LogUtil.showTableData(tableName, ret);
+        return ret;
     }
 }

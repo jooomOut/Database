@@ -30,16 +30,12 @@ public class TableTest {
     }
 
     private void createDuplicateTable() {
-        String beforeTest = "createDuplicateTable - 입력 값";
-        String afterTest = "createDuplicateTable - 결과 값";
         String testName = "createDuplicateTable";
-        TableDto dto = new TableDto(tableName, columns, size, primaryKeyIndex, null);
-        LogUtil.showTableData(beforeTest,dto);
+        TableDto dto = new TableDto(tableName, columns, size, primaryKeyIndex, null);;
         try {
             databaseInterface.createTable(dto);
         } catch(TableAlreadyExistsException e){
-            TableDto ret = databaseInterface.getTableData(tableName);
-            LogUtil.showTableData(afterTest,ret);
+            databaseInterface.getTableData(dto.getTableName());
             LogUtil.printTestTitle(testName, "테스트 성공");
         } catch(IOException e){
             LogUtil.printTestTitle(testName, "테스트 실패");
@@ -48,15 +44,10 @@ public class TableTest {
     }
 
     private void createNormalTable() {
-        String beforeTest = "createNormalTable - 입력 값";
-        String afterTest = "createNormalTable - 결과";
         String testName=  "createNormalTable";
         TableDto dto = new TableDto(tableName, columns, size, primaryKeyIndex, null);
-        LogUtil.showTableData(beforeTest,dto);
         try {
             databaseInterface.createTable(dto);
-            TableDto ret = databaseInterface.getTableData(tableName);
-            LogUtil.showTableData(afterTest, ret);
             LogUtil.printTestTitle(testName, "테스트 성공");
         } catch(Exception e){
             LogUtil.printTestTitle(testName, "테스트 실패");
