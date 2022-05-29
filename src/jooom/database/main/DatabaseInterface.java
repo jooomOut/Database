@@ -15,4 +15,5 @@ public interface DatabaseInterface {
 
     void dropTable(String tableName);
     TableDto getTableData(String tableName);
+    List<Map<String,String>> findAllRecords(String tableName);
 }
