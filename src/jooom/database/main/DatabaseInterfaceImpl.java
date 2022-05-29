@@ -41,6 +41,12 @@ public class DatabaseInterfaceImpl implements DatabaseInterface {
     }
 
     @Override
+    public List<Map<String, String>> findAllRecords(String tableName) {
+        TableDto tableDto = getTableData(tableName);
+        return searchColumns(tableName, tableDto.getColumns());
+    }
+
+    @Override
     public Map<String, String> search(String tableName, String key) {
         return recordManager.search(tableName, key);
     }
