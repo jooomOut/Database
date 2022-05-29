@@ -2,6 +2,7 @@ package jooom.application.test;
 
 import jooom.database.main.DatabaseInterface;
 import jooom.database.main.DatabaseInterfaceImpl;
+import jooom.database.main.DatabaseInterfaceProxy;
 import jooom.database.main.record.page.RecordPageStructure;
 import jooom.database.main.record.page.SlottedPageStructure;
 import jooom.database.main.service.RecordManager;
@@ -14,13 +15,7 @@ public class Main {
     private static DatabaseInterface databaseInterface;
 
     public static void main(String[] args) throws IOException {
-        TableManagerImpl tableManager = new TableManagerImpl();
-        RecordPageStructure pageStructure = SlottedPageStructure.of();
-        RecordManager recordManager = new RecordManager(tableManager, pageStructure);
-        databaseInterface = new DatabaseInterfaceImpl(
-            new TableManagerImpl(),
-                recordManager
-        );
+        setDBInterfaceProxy();
 
         doTest(databaseInterface);
         run(databaseInterface);
@@ -33,6 +28,16 @@ public class Main {
 
     private static void run(DatabaseInterface databaseInterface) {
 
+    }
+    private static void setDBInterfaceProxy() throws IOException {
+        TableManagerImpl tableManager = new TableManagerImpl();
+        RecordPageStructure pageStructure = SlottedPageStructure.of();
+        RecordManager recordManager = new RecordManager(tableManager, pageStructure);
+        DatabaseInterface databaseInterfaceImpl = new DatabaseInterfaceImpl(
+                new TableManagerImpl(),
+                recordManager
+        );
+        databaseInterface = new DatabaseInterfaceProxy(databaseInterfaceImpl);
     }
 
 }
