@@ -120,13 +120,11 @@ public class TableManagerImpl implements TableManager {
                 sizes[i] = sc.nextInt();
             }
             int primaryKeyIdx = sc.nextInt();
-            String filePath = sc.nextLine();
             TableDto ret = new TableDto(
                     tableName,
                     columns,
                     sizes,
-                    primaryKeyIdx,
-                    filePath
+                    primaryKeyIdx
             );
             return ret;
         } catch (FileNotFoundException e) {
