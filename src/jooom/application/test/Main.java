@@ -14,6 +14,7 @@ import jooom.database.main.service.RecordManager;
 import jooom.database.main.service.impl.TableManagerImpl;
 import jooom.database.main.util.LogUtil;
 import jooom.database.test.TestManager;
+import jooom.database.test.exception.TestFailException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,13 +27,17 @@ public class Main {
     private static DatabaseInterface databaseInterface;
     public static void main(String[] args) throws IOException {
         setDBInterfaceProxy();
-
-        doTest(databaseInterface);
+        try {
+            doTest(databaseInterface);
+        } catch (TestFailException e){
+            LogUtil.printTitle("테스트에 실패하였습니다.");
+            return;
+        }
         run(databaseInterface);
         LogUtil.printTitle("종료되었습니다.");
     }
 
-    private static void doTest(DatabaseInterface databaseInterface) {
+    private static void doTest(DatabaseInterface databaseInterface) throws IOException {
         TestManager testManager = new TestManager(databaseInterface);
         testManager.run();
     }

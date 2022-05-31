@@ -4,6 +4,7 @@ import jooom.database.main.DatabaseInterface;
 import jooom.database.main.dto.TableDto;
 import jooom.database.main.exception.table.TableAlreadyExistsException;
 import jooom.database.main.util.LogUtil;
+import jooom.database.test.exception.TestFailException;
 
 import java.io.IOException;
 
@@ -40,6 +41,7 @@ public class TableTest {
             LogUtil.printTestTitle(testName, "테스트 성공");
         } catch(IOException e){
             LogUtil.printTestTitle(testName, "테스트 실패");
+            throw new TestFailException(testName);
         }
 
     }
@@ -52,6 +54,7 @@ public class TableTest {
             LogUtil.printTestTitle(testName, "테스트 성공");
         } catch(Exception e){
             LogUtil.printTestTitle(testName, "테스트 실패");
+            throw new TestFailException(testName);
         }
     }
 }
