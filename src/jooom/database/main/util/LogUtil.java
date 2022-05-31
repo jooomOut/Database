@@ -53,6 +53,10 @@ public class LogUtil {
     }
 
     public static void showRecordData(String testName ,String tableName, List<Map<String, String>> records, String[] columns) {
+        if (records.size() == 0 || records.isEmpty()) {
+            printTitle("검색 결과가 존재하지 않습니다.");
+            return;
+        }
         System.out.println();
         int column = columns.length;
         int colLine = column * 20 + column * 3 + 1;

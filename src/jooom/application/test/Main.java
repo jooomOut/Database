@@ -4,6 +4,7 @@ import jooom.database.main.DatabaseInterface;
 import jooom.database.main.DatabaseInterfaceImpl;
 import jooom.database.main.DatabaseInterfaceProxy;
 import jooom.database.main.dto.TableDto;
+import jooom.database.main.exception.record.DuplicateKeyException;
 import jooom.database.main.exception.record.NoPrimaryKeyException;
 import jooom.database.main.exception.table.TableAlreadyExistsException;
 import jooom.database.main.exception.table.WrongTableDataException;
@@ -28,6 +29,7 @@ public class Main {
 
         doTest(databaseInterface);
         run(databaseInterface);
+        LogUtil.printTitle("종료되었습니다.");
     }
 
     private static void doTest(DatabaseInterface databaseInterface) {
@@ -59,14 +61,21 @@ public class Main {
                 case "3":
                     search(br);
                     break;
-                case "4": break;
+                case "4":
+                    searchColumns(br);break;
             }
-
         }
 
-        //str = br.readLine();
+    }
 
+    private static void searchColumns(BufferedReader br) throws IOException {
+        System.out.printf("테이블 이름을 입력해주세요. :");
+        String tableName = br.readLine().strip();
 
+        System.out.printf("원하는 컬럼 이름을 입력해주세요 ex) name age weight :");
+        String[] columnName = Arrays.stream(br.readLine().split(" ")).map(String::strip).toArray(String[]::new);
+
+        databaseInterface.searchColumns(tableName, columnName);
     }
 
     private static void search(BufferedReader br) throws IOException {
@@ -103,10 +112,8 @@ public class Main {
         }
         try {
             databaseInterface.insert(tableName, columns);
-        } catch (WrongTableDataException e){
-            System.err.println("테이블 정보가 잘못되었습니다!");
-        } catch (NoPrimaryKeyException e){
-            System.err.println("기본 키가 존재하지 않습니다.");
+        } catch (WrongTableDataException | NoPrimaryKeyException | DuplicateKeyException e){
+            System.err.println(e.getMessage());
         }
     }
 
