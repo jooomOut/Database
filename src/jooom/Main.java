@@ -1,4 +1,4 @@
-package jooom.application.test;
+package jooom;
 
 import jooom.database.main.DatabaseInterface;
 import jooom.database.main.DatabaseInterfaceImpl;
