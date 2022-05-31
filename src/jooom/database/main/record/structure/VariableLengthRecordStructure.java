@@ -11,8 +11,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class VariableLengthRecordStructure extends RecordStructure{
-    private static final String SETTING_PATH = "settings/record_structure.txt";
-
+    private static final String SETTING_PATH = "settings/";
+    private static final String FILE_PATH = SETTING_PATH + "record_structure.txt";
     /*BYTE*/
     private static int NULL_BITMAP_SIZE = 2;
     private static int VARIABLE_OFFSET = 4;
@@ -195,11 +195,7 @@ public class VariableLengthRecordStructure extends RecordStructure{
     }
 
     private void setRecordParameters() throws IOException {
-        File settingFile = new File(SETTING_PATH);
-        if (!settingFile.exists()){
-            // 레코드 대한 설정 파일이 없을 경우 기본 값으로 새로 생성한다.
-            writeDefaultSetting(settingFile);
-        }
+        File settingFile = loadFile();
         try {
             Scanner sc = new Scanner(settingFile);
 
@@ -211,8 +207,19 @@ public class VariableLengthRecordStructure extends RecordStructure{
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-
     }
+
+    private File loadFile() throws IOException {
+        File settingPath = new File(SETTING_PATH);
+        if (!settingPath.exists()){
+            settingPath.mkdir();
+        }
+        File settingFile = new File(FILE_PATH);
+        // 레코드 대한 설정 파일이 없을 경우 기본 값으로 새로 생성한다.
+        writeDefaultSetting(settingFile);
+        return settingPath;
+    }
+
     /**
      * 클래스 생성 시, 설정 txt 파일이 없을 경우
      * 단 1회 시작함. 설정 txt 파일을 기본 값으로 생성

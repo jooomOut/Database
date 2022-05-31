@@ -1,4 +1,4 @@
-package jooom.application.test;
+package jooom;
 
 import jooom.database.main.DatabaseInterface;
 import jooom.database.main.DatabaseInterfaceImpl;
@@ -6,6 +6,7 @@ import jooom.database.main.DatabaseInterfaceProxy;
 import jooom.database.main.dto.TableDto;
 import jooom.database.main.exception.record.DuplicateKeyException;
 import jooom.database.main.exception.record.NoPrimaryKeyException;
+import jooom.database.main.exception.record.TooLargeColumnException;
 import jooom.database.main.exception.table.TableAlreadyExistsException;
 import jooom.database.main.exception.table.WrongTableDataException;
 import jooom.database.main.record.page.RecordPageStructure;
@@ -117,7 +118,7 @@ public class Main {
         }
         try {
             databaseInterface.insert(tableName, columns);
-        } catch (WrongTableDataException | NoPrimaryKeyException | DuplicateKeyException e){
+        } catch (WrongTableDataException | NoPrimaryKeyException | DuplicateKeyException | TooLargeColumnException e){
             System.err.println(e.getMessage());
         }
     }
