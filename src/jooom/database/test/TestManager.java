@@ -1,6 +1,7 @@
 package jooom.database.test;
 
 import jooom.database.main.DatabaseInterface;
+import jooom.database.test.exception.TestFailException;
 
 public class TestManager {
     private TableTest tableTest;
@@ -12,9 +13,14 @@ public class TestManager {
     }
 
     public void run(){
-        tableTest.testAllMethods();
-        recordTest.testAllMethods();
+        try {
+            tableTest.testAllMethods();
+            recordTest.testAllMethods();
+            tableTest.clearTestTable();
+        } catch (TestFailException e){
+            tableTest.clearTestTable();
+            throw e;
+        }
 
-        tableTest.clearTestTable();
     }
 }

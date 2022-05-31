@@ -105,7 +105,7 @@ public class TableManagerImpl implements TableManager {
         }
         writer.println();
         writer.println(tableDto.getPrimaryKeyIndex());
-        writer.println(RECORD_PATH +"/" +tableDto.getTableName()+"/");
+        //writer.println(RECORD_PATH +"/" +tableDto.getTableName()+"/");
         // 5. BufferedWriter close
         writer.close();
     }
