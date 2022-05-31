@@ -42,6 +42,11 @@ public class LogUtil {
     }
 
     public static void showRecordData(String testName ,String tableName, Map<String, String> record, String[] columns) {
+        if (record.isEmpty()) {
+            drawTitle("결과가 존재하지 않습니다.", colLine);
+            System.out.println();
+            return;
+        }
         List<Map<String, String>> records = new ArrayList<>();
         records.add(record);
         showRecordData(testName, tableName, records, columns);
@@ -103,5 +108,4 @@ public class LogUtil {
     }
 
     private static void drawLine(int col){ for (int i = 0 ; i < col ; i ++)System.out.print("="); System.out.println();}
-
 }

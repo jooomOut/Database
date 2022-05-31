@@ -56,7 +56,9 @@ public class Main {
                 case "2":
                     insertRecord(br);
                     break;
-                case "3": break;
+                case "3":
+                    search(br);
+                    break;
                 case "4": break;
             }
 
@@ -64,6 +66,21 @@ public class Main {
 
         //str = br.readLine();
 
+
+    }
+
+    private static void search(BufferedReader br) throws IOException {
+        System.out.printf("테이블 이름을 입력해주세요. :");
+        String tableName = br.readLine().strip();
+
+        System.out.printf("검색하고자 하는 기본 키 값을 입력해주세요. :");
+        String primaryKey = br.readLine().strip();
+
+        try {
+            Map<String, String> ret = databaseInterface.search(tableName, primaryKey);
+        } catch (WrongTableDataException e){
+            System.err.println("테이블 정보가 잘못되었습니다!");
+        }
 
     }
 
