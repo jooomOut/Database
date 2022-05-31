@@ -3,7 +3,7 @@
 mkdir result
 mkdir result/settings
 
-cp -R settings result/settings
+cp -R -f settings result/settings
 
 find ./src/jooom/ -name "*.java" > source.txt
 
