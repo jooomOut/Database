@@ -14,6 +14,10 @@ public class SlottedPageStructure extends RecordPageStructure {
     private static final String SETTING_PATH = "settings/common.txt";
     private static final String FILE_PATH = "files/records/";
 
+    /**
+     * 인스턴스가 생성될 때 파일에서 읽어들인 값으로
+     * 아래 값을 수정하게 됨
+     * */
     private static int DEFAULT_SIZE_BYTE = 4096;
     private static int DEFAULT_ENTRY_SIZE_BYTE = 4;
     private static int DEFAULT_END_OF_FREE_SPACE_BYTE = 4;

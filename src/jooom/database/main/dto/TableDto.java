@@ -5,14 +5,12 @@ public class TableDto {
     String[] columns;
     int[] sizes;
     int primaryKeyIndex;
-    String filePath;
 
-    public TableDto(String tableName, String[] columns, int[] sizes, int primaryKeyIndex, String filePath) {
+    public TableDto(String tableName, String[] columns, int[] sizes, int primaryKeyIndex) {
         this.tableName = tableName;
         this.columns = columns;
         this.sizes = sizes;
         this.primaryKeyIndex = primaryKeyIndex;
-        this.filePath = filePath;
     }
 
     public String getTableName() {
@@ -31,7 +29,4 @@ public class TableDto {
         return primaryKeyIndex;
     }
 
-    public String getFilePath() {
-        return filePath;
-    }
 }

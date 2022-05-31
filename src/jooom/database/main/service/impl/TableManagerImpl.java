@@ -105,7 +105,7 @@ public class TableManagerImpl implements TableManager {
         }
         writer.println();
         writer.println(tableDto.getPrimaryKeyIndex());
-        writer.println(RECORD_PATH +"/" +tableDto.getTableName()+"/");
+        //writer.println(RECORD_PATH +"/" +tableDto.getTableName()+"/");
         // 5. BufferedWriter close
         writer.close();
     }
@@ -120,13 +120,11 @@ public class TableManagerImpl implements TableManager {
                 sizes[i] = sc.nextInt();
             }
             int primaryKeyIdx = sc.nextInt();
-            String filePath = sc.nextLine();
             TableDto ret = new TableDto(
                     tableName,
                     columns,
                     sizes,
-                    primaryKeyIdx,
-                    filePath
+                    primaryKeyIdx
             );
             return ret;
         } catch (FileNotFoundException e) {

@@ -11,6 +11,12 @@ import java.util.stream.Collectors;
 
 public class LogUtil {
     private final static Logger log = Logger.getGlobal();
+    private static int colLine = 100;
+
+    public static void printTitle(String title){
+        drawTitle(title, colLine);
+        drawLine(colLine);
+    }
 
     public static void printTestTitle(String testName, String msg){
         System.out.printf("%-30s - %s\n", testName, msg);
@@ -36,12 +42,21 @@ public class LogUtil {
     }
 
     public static void showRecordData(String testName ,String tableName, Map<String, String> record, String[] columns) {
+        if (record.isEmpty()) {
+            drawTitle("결과가 존재하지 않습니다.", colLine);
+            System.out.println();
+            return;
+        }
         List<Map<String, String>> records = new ArrayList<>();
         records.add(record);
         showRecordData(testName, tableName, records, columns);
     }
 
     public static void showRecordData(String testName ,String tableName, List<Map<String, String>> records, String[] columns) {
+        if (records.size() == 0 || records.isEmpty()) {
+            printTitle("검색 결과가 존재하지 않습니다.");
+            return;
+        }
         System.out.println();
         int column = columns.length;
         int colLine = column * 20 + column * 3 + 1;
@@ -62,6 +77,9 @@ public class LogUtil {
         drawLine(colLine);
     }
 
+    public static void showCommandGuide(){
+        drawTitle("1. 테이블 생성 | 2. 레코드 삽입 | 3. 레코드 검색 | 4. 컬럼 검색 | -1. 종료",colLine);
+    }
     private static int getColumnSize(List<Map<String, String>> records) {
          List<Integer> intList = records.stream().map(record -> record.keySet().size()).collect(Collectors.toList());
          return intList.stream().mapToInt(x -> x).max().orElse(0);
@@ -94,5 +112,4 @@ public class LogUtil {
     }
 
     private static void drawLine(int col){ for (int i = 0 ; i < col ; i ++)System.out.print("="); System.out.println();}
-
 }
