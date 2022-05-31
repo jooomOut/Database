@@ -50,10 +50,10 @@ public class Main {
         while (!command.equals("-1")){
             LogUtil.showCommandGuide();
             System.out.printf("원하는 기능을 입력하세요 : ");
-            command = br.readLine();
+            command = br.readLine().strip();
             while (!validateCommand(command)){
                 System.out.printf("정해진 범위의 값을 입력하세요 : ");
-                command = br.readLine();
+                command = br.readLine().strip();
             }
 
             switch (command){
@@ -167,6 +167,7 @@ public class Main {
     }
 
     private static boolean validateCommand(String command) {
+        if (command.equals("-1")) return true;
         int commandInt = -1;
         try {
             commandInt = Integer.parseInt(command);
