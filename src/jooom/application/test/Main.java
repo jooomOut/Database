@@ -4,7 +4,9 @@ import jooom.database.main.DatabaseInterface;
 import jooom.database.main.DatabaseInterfaceImpl;
 import jooom.database.main.DatabaseInterfaceProxy;
 import jooom.database.main.dto.TableDto;
+import jooom.database.main.exception.record.NoPrimaryKeyException;
 import jooom.database.main.exception.table.TableAlreadyExistsException;
+import jooom.database.main.exception.table.WrongTableDataException;
 import jooom.database.main.record.page.RecordPageStructure;
 import jooom.database.main.record.page.SlottedPageStructure;
 import jooom.database.main.service.RecordManager;
@@ -15,9 +17,7 @@ import jooom.database.test.TestManager;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -53,7 +53,9 @@ public class Main {
                 case "1":
                     createTable(br);
                     break;
-                case "2": break;
+                case "2":
+                    insertRecord(br);
+                    break;
                 case "3": break;
                 case "4": break;
             }
@@ -63,6 +65,32 @@ public class Main {
         //str = br.readLine();
 
 
+    }
+
+    private static void insertRecord(BufferedReader br) throws IOException {
+        Map<String, String> columns = new HashMap<>();
+        System.out.printf("테이블 이름을 입력해주세요. :");
+        String tableName = br.readLine().strip();
+
+        System.out.printf("컬럼 이름을 입력해주세요 ex) name age weight :");
+        String[] columnName = Arrays.stream(br.readLine().split(" ")).map(String::strip).toArray(String[]::new);
+
+        System.out.printf("컬럼 값을 입력해주세요 ex) Bill 20 76 :");
+        String[] columnValue = Arrays.stream(br.readLine().split(" ")).map(String::strip).toArray(String[]::new);
+        if (columnName.length != columnValue.length){
+            System.out.println("잘못된 정보 입니다.");
+            return;
+        }
+        for (int i = 0 ; i < columnName.length ; i++){
+            columns.put(columnName[i], columnValue[i]);
+        }
+        try {
+            databaseInterface.insert(tableName, columns);
+        } catch (WrongTableDataException e){
+            System.err.println("테이블 정보가 잘못되었습니다!");
+        } catch (NoPrimaryKeyException e){
+            System.err.println("기본 키가 존재하지 않습니다.");
+        }
     }
 
     private static void createTable(BufferedReader br) throws IOException {

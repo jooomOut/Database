@@ -18,11 +18,12 @@ public class TableTest {
         this.databaseInterface = databaseInterface;
     }
 
-    public void testAllMethods(){
-        createTableTest();
-    }
+
     public void clearTestTable() {
         databaseInterface.dropTable(tableName);
+    }
+    public void testAllMethods(){
+        createTableTest();
     }
     public void createTableTest(){
         createNormalTable();
@@ -31,7 +32,7 @@ public class TableTest {
 
     private void createDuplicateTable() {
         String testName = "createDuplicateTable";
-        TableDto dto = new TableDto(tableName, columns, size, primaryKeyIndex, null);;
+        TableDto dto = new TableDto(tableName, columns, size, primaryKeyIndex);;
         try {
             databaseInterface.createTable(dto);
         } catch(TableAlreadyExistsException e){
@@ -45,7 +46,7 @@ public class TableTest {
 
     private void createNormalTable() {
         String testName=  "createNormalTable";
-        TableDto dto = new TableDto(tableName, columns, size, primaryKeyIndex, null);
+        TableDto dto = new TableDto(tableName, columns, size, primaryKeyIndex);
         try {
             databaseInterface.createTable(dto);
             LogUtil.printTestTitle(testName, "테스트 성공");
