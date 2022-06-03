@@ -11,7 +11,7 @@ import java.io.IOException;
 public class TableTest {
     private DatabaseInterface databaseInterface;
 
-    private static final String tableName = "student";
+    private static final String tableName = "student_test_only";
     private static final String[] columns = new String[]{"dept_name", "name", "id", "tot_cred"};
     private static final int[] size = new int[]{0,0,11,3};
     private static final int primaryKeyIndex = 2;

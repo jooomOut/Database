@@ -14,6 +14,8 @@ import java.util.Map;
 public class RecordTest {
     private DatabaseInterface databaseInterface;
     private int recordNum = 0;
+    private static String tableName = "student_test_only";
+
     public RecordTest(DatabaseInterface databaseInterface) {
         this.databaseInterface = databaseInterface;
     }
@@ -23,7 +25,6 @@ public class RecordTest {
     }
 
     private void insertRecordTest(){
-        String tableName = "student";
         //for (int i = 0 ; i<400 ; i++)
         insertTest(tableName);
         searchTest(tableName);
