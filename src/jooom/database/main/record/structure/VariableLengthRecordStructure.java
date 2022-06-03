@@ -211,13 +211,13 @@ public class VariableLengthRecordStructure extends RecordStructure{
 
     private File loadFile() throws IOException {
         File settingPath = new File(SETTING_PATH);
-        if (!settingPath.exists()){
-            settingPath.mkdir();
-        }
+        if (!settingPath.exists()) settingPath.mkdir();
+
         File settingFile = new File(FILE_PATH);
         // 레코드 대한 설정 파일이 없을 경우 기본 값으로 새로 생성한다.
-        writeDefaultSetting(settingFile);
-        return settingPath;
+        if (!settingFile.exists()) writeDefaultSetting(settingFile);
+
+        return settingFile;
     }
 
     /**
